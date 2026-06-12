@@ -10,7 +10,7 @@ MT5 Terminal
     ↓ (positions_get / history_deals_get)
 MT5Poller (daemon thread, 每 60s)
     ↓
-SQLite (open_positions, sync_state, sync_log)
+SurrealDB (open_positions, sync_state, sync_log)
     ↓
 FastAPI (port 9001)
     ├── GET /         → HTML dashboard (auto-refresh 10s)

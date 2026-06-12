@@ -94,7 +94,7 @@
 - `hosted/server.py`
 - 實作基本端點：store_decision、recall_decisions、get_performance
 - API key 認證（Bearer tm_live_* / tm_test_*）
-- SQLite 儲存（account isolation）+ 22 tests
+- SurrealDB 儲存（account isolation）+ 22 tests
 - Commit: `feat: add hosted API server (MVP)` → `1ef9e23`
 
 ### Task 4.3：部署到 mcp.mnemox.ai ✅

@@ -1,7 +1,7 @@
 """Live monitor for replay engine progress. Run in a separate CMD window."""
 
 import json
-import sqlite3
+import surrealdb
 import time
 from pathlib import Path
 
@@ -36,7 +36,7 @@ def get_stats():
     wins = 0
     if DB.exists():
         try:
-            conn = sqlite3.connect(DB)
+            conn = surrealdb.connect(DB)
             row = conn.execute(
                 "SELECT COUNT(*), COALESCE(SUM(pnl),0), "
                 "SUM(CASE WHEN pnl > 0 THEN 1 ELSE 0 END) "

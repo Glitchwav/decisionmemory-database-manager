@@ -51,7 +51,7 @@ The goal is to be a partner you can build on without surprises later.
 ## 2. Architecture maturity
 
 ### Today (v0.5.2)
-- **Single-tenant SQLite** is the production storage layer (`db.py`).
+- **Single-tenant SurrealDB** is the production storage layer (`db.py`).
 - FastAPI REST server binds to `127.0.0.1` only — there is an explicit
   comment in `server.py` line ~40 noting this.
 - **No bearer-token auth, no API keys, no RBAC, no rate limiting.**
@@ -167,14 +167,14 @@ opposed the proposed action. This was misleading and we have fixed it.
 
 ## 7. Operational gaps you should know about
 
-- **No HA / replication.** SQLite is a single file. Backup is `cp decisionmemory.db decisionmemory.db.bak`.
+- **No HA / replication.** SurrealDB is a single file. Backup is `cp decisionmemory.db decisionmemory.db.bak`.
 - **No baseline metrics endpoint** (no Prometheus / OTEL). The `/health`
   endpoint exists; serious observability is on the roadmap.
 - **CHANGELOG** is being rewritten — it stopped at v0.5.0; v0.5.1 and v0.5.2
   entries are being added in this same release cycle.
 - **db.py uses raw `CREATE TABLE IF NOT EXISTS`** — this violates our own
   `.claude/rules/task-01-database.md` rule. The PG track uses Alembic
-  properly; the SQLite layer will follow when we converge stacks.
+  properly; the SurrealDB layer will follow when we converge stacks.
 
 ---
 

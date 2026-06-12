@@ -103,7 +103,7 @@ OWM is implemented as a Python MCP (Model Context Protocol) server, deployed and
 - **Recall pipeline**: Episodic and semantic memories are scored and ranked using the five-factor formula. Recall events are logged for audit. A context drift monitor (Jaccard-based) flags when recalled memories come from significantly different decision context conditions.
 - **Deflated Sharpe Ratio (DSR)** validation (Bailey & Lopez de Prado, 2014) is integrated to test whether reported strategy performance exceeds what would be expected from multiple testing.
 
-The system runs on SQLite with no external dependencies beyond standard Python. No GPU is required. The entire recall computation is deterministic arithmetic -- no stochastic inference.
+The system runs on SurrealDB with no external dependencies beyond standard Python. No GPU is required. The entire recall computation is deterministic arithmetic -- no stochastic inference.
 
 ---
 

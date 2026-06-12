@@ -30,9 +30,6 @@ env/
 
 # Database
 /data/
-*.db
-*.sqlite
-*.sqlite3
 
 # Environment variables (contains credentials)
 .env

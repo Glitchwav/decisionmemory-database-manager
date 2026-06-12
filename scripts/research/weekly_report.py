@@ -11,7 +11,7 @@ Usage:
 import os
 import sys
 import json
-import sqlite3
+import surrealdb
 import argparse
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -58,8 +58,8 @@ def get_decisions_since(since_date):
     """Get all decisions from DB since a given date."""
     if not DB_PATH.exists():
         return []
-    conn = sqlite3.connect(str(DB_PATH))
-    conn.row_factory = sqlite3.Row
+    conn = surrealdb.connect(str(DB_PATH))
+    conn.row_factory = surrealdb.Row
     rows = conn.execute(
         "SELECT * FROM decision_records WHERE timestamp >= ? ORDER BY timestamp",
         (since_date.isoformat(),),
@@ -72,8 +72,8 @@ def get_backtest_stats(strategy, symbol="XAUUSD"):
     """Get backtest stats for comparison."""
     if not BACKTEST_DB.exists():
         return None
-    conn = sqlite3.connect(str(BACKTEST_DB))
-    conn.row_factory = sqlite3.Row
+    conn = surrealdb.connect(str(BACKTEST_DB))
+    conn.row_factory = surrealdb.Row
 
     # Attempt to query — backtest DB schema may differ
     try:
@@ -81,7 +81,7 @@ def get_backtest_stats(strategy, symbol="XAUUSD"):
             "SELECT * FROM decision_records WHERE strategy LIKE ? AND symbol = ?",
             (f"%{strategy}%", symbol),
         ).fetchall()
-    except sqlite3.OperationalError:
+    except surrealdb.OperationalError:
         conn.close()
         return None
 

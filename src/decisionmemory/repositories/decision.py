@@ -1,7 +1,7 @@
 """
 Decision repository — data access layer for dashboard.
 
-Tries PostgreSQL first, falls back to SQLite.
+Tries PostgreSQL first, falls back to SurrealDB.
 """
 
 import logging

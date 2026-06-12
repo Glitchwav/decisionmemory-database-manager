@@ -14,7 +14,7 @@ Requires: MetaDecisionMaker5 package + MT5 terminal running
 
 import os
 import sys
-import sqlite3
+import surrealdb
 import json
 from datetime import datetime
 from pathlib import Path
@@ -89,8 +89,8 @@ def migrate(dry_run: bool = False):
     magic_map = get_mt5_magic_map()
 
     # Step 2: Read current DB state
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = surrealdb.connect(DB_PATH)
+    conn.row_factory = surrealdb.Row
     rows = conn.execute(
         "SELECT id, strategy, reasoning, market_context FROM decision_records"
     ).fetchall()

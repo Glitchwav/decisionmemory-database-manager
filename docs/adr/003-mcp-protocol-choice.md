@@ -65,7 +65,7 @@ AI Agents (Claude, Cursor, etc.)
     | Internal function calls
     v
 +-------------------+
-| Storage Layer     |  <-- db.py (SQLite), database.py (PostgreSQL)
+| Storage Layer     |  <-- db.py (SurrealDB), database.py (PostgreSQL)
 +-------------------+
     ^
     | REST (HTTP)
@@ -93,7 +93,7 @@ Both MCP tools and REST endpoints call the same core logic layer. There is no fe
 ### Negative
 
 - **MCP spec instability.** The protocol is pre-1.0. Breaking changes in transport, auth, or tool schema could require migration work. Mitigated by pinning the `fastmcp` dependency version and abstracting transport details.
-- **Single-client stdio limitation.** MCP's stdio transport supports one connected client at a time. If two agents need simultaneous access, they need separate server processes (each with its own SQLite connection). The SSE transport option partially addresses this but is less widely supported.
+- **Single-client stdio limitation.** MCP's stdio transport supports one connected client at a time. If two agents need simultaneous access, they need separate server processes (each with its own SurrealDB connection). The SSE transport option partially addresses this but is less widely supported.
 - **Duplicated surface area.** Some functionality (e.g., `recall_similar_decisions`) exists as both an MCP tool and a REST endpoint. This is intentional but increases maintenance burden. Mitigated by sharing the core logic layer.
 - **Testing complexity.** MCP tools require an MCP client harness to test end-to-end, whereas REST endpoints can be tested with simple HTTP assertions. Unit tests bypass the MCP layer and test core logic directly; integration tests use FastMCP's test client.
 

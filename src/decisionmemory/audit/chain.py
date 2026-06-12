@@ -30,7 +30,6 @@ Forwards-compat
 from __future__ import annotations
 
 import hashlib
-import sqlite3
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional, Tuple
@@ -79,14 +78,14 @@ class DailyRoot:
 
 
 class ChainBuilder:
-    """Append-and-verify operations against a SQLite-backed audit chain.
+    """Append-and-verify operations against the audit chain.
 
-    Callers must supply a sqlite3.Connection. The class assumes the
+    Callers must supply a compatible database connection. The class assumes the
     `audit_chain` and `audit_roots` tables already exist (created by
     Database._init_schema).
     """
 
-    def __init__(self, conn: sqlite3.Connection):
+    def __init__(self, conn):
         self.conn = conn
 
     # ------------------------------------------------------------------
@@ -215,9 +214,10 @@ class ChainBuilder:
                     "first_break_at": first_entry.sequence_num,
                     "reason": "missing predecessor sequence_num",
                 }
-            expected_prev = anchor["data_hash"] if isinstance(
-                anchor, sqlite3.Row
-            ) else anchor[0]
+            try:
+                expected_prev = anchor["data_hash"]
+            except (TypeError, KeyError):
+                expected_prev = anchor[0]
 
         checked = 0
         for row in rows:

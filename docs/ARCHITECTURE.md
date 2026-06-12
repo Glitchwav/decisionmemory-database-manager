@@ -1,6 +1,6 @@
 # Architecture Overview
 
-Internal architecture of DecisionMemory Protocol: module structure, data flow, SQLite schema, and the 3-layer memory model.
+Internal architecture of DecisionMemory Protocol: module structure, data flow, SurrealDB schema, and the 3-layer memory model.
 
 ---
 
@@ -39,7 +39,7 @@ Internal architecture of DecisionMemory Protocol: module structure, data flow, S
 │  │              3-Layer Memory Architecture                  │   │
 │  │  ┌──────────┐  ┌──────────────┐  ┌───────────────────┐  │   │
 │  │  │ L1 (Hot) │  │  L2 (Warm)   │  │    L3 (Cold)      │  │   │
-│  │  │ RAM      │  │  JSON in DB  │  │    SQLite          │  │   │
+│  │  │ RAM      │  │  JSON in DB  │  │    SurrealDB          │  │   │
 │  │  └──────────┘  └──────────────┘  └───────────────────┘  │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │                                                                  │
@@ -58,7 +58,7 @@ Internal architecture of DecisionMemory Protocol: module structure, data flow, S
 | Module | File | Responsibility |
 |--------|------|---------------|
 | **Models** | `src/decisionmemory/models.py` | Pydantic schemas: `DecisionRecord`, `Decision ContextContext`, `SessionState`, enums |
-| **Database** | `src/decisionmemory/db.py` | SQLite CRUD, schema initialization, JSON serialization |
+| **Database** | `src/decisionmemory/db.py` | SurrealDB CRUD, schema initialization, JSON serialization |
 | **DecisionJournal** | `src/decisionmemory/journal.py` | Decision recording with validation, querying, active decision tracking |
 | **StateManager** | `src/decisionmemory/state.py` | Cross-session persistence, warm memory, risk constraints |
 | **ReflectionEngine** | `src/decisionmemory/reflection.py` | Daily summary generation, LLM integration, output validation |
@@ -84,7 +84,7 @@ DecisionMemory uses a tiered memory model. Recent events stay in RAM (L1), learn
 | **Access speed** | Instant (no I/O) |
 | **Contents** | Active positions, current session state, pending decisions |
 
-When an agent calls `state.load`, the StateManager reads from L3 (SQLite) into L1. Changes are flushed back to L3 on `state.save`.
+When an agent calls `state.load`, the StateManager reads from L3 (SurrealDB) into L1. Changes are flushed back to L3 on `state.save`.
 
 ### L2 — Warm Memory (JSON in DB)
 
@@ -97,11 +97,11 @@ When an agent calls `state.load`, the StateManager reads from L3 (SQLite) into L
 
 L2 is the agent's learned knowledge. The ReflectionEngine writes here after daily analysis. LLM output is validated before reaching L2 — invalid output triggers a rule-based fallback.
 
-### L3 — Cold Memory (SQLite)
+### L3 — Cold Memory (SurrealDB)
 
 | Property | Value |
 |----------|-------|
-| **Storage** | SQLite database (`data/decisionmemory.db`) |
+| **Storage** | SurrealDB database (`data/decisionmemory.db`) |
 | **Lifetime** | Permanent |
 | **Access speed** | Standard DB query |
 | **Contents** | Every decision record, full history, session state snapshots, strategy adjustments |
@@ -145,7 +145,7 @@ Next Session
 
 ---
 
-## SQLite Schema
+## SurrealDB Schema
 
 ### `decision_records` table
 
@@ -220,7 +220,7 @@ CREATE INDEX idx_adjustments_type ON strategy_adjustments(adjustment_type);
 - Timestamps stored as ISO 8601 text strings, always UTC.
 - JSON fields (`decision context_context`, `warm_memory`, etc.) stored as text, deserialized on read.
 - `decision_references` is `"[]"` by default (empty JSON array).
-- No ORM — the `Database` class uses raw `sqlite3` for transparency.
+- No ORM — the `Database` class uses raw `surrealdb` for transparency.
 
 ---
 
@@ -272,7 +272,7 @@ scripts/mt5_sync.py / MT5Connector.sync_decisions()
 DecisionJournal
     │  record_decision() + record_outcome() for each position
     ▼
-L3 (SQLite)
+L3 (SurrealDB)
 ```
 
 ### Daily Reflection Flow
@@ -310,7 +310,7 @@ Saved to reflections/YYYY-MM-DD.md by the caller
 
 3. **All timestamps in UTC.** No local timezone handling inside the protocol. Adapters convert to UTC at ingestion.
 
-4. **No ORM.** Direct SQLite with raw SQL via the `Database` class. This keeps the data layer transparent and debuggable.
+4. **No ORM.** Direct SurrealDB with raw SQL via the `Database` class. This keeps the data layer transparent and debuggable.
 
 5. **Graceful degradation.** If MT5 is unavailable, the import is guarded (`MT5 = None`). If the LLM API fails, rule-based reflection runs. If no decisions exist for a day, the system returns "insufficient data" rather than crashing.
 

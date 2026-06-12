@@ -13,7 +13,6 @@ import pytest
 
 
 # ── Force test database BEFORE any SurrealDatabase import ──────────────
-os.environ["DECISIONMEMORY_BACKEND"] = "surreal"
 os.environ["SURREAL_DB"] = os.environ.get("SURREAL_DB_TEST", "decisionmemory_test")
 # SurrealDB v2 requires auth by default
 os.environ.setdefault("SURREAL_USER", "root")

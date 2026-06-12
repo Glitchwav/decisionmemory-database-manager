@@ -1,6 +1,6 @@
 # DecisionMemory + Database Manager
 
-Persistent, outcome-aware memory for AI decision agents, backed by SQLite or SurrealDB.
+Persistent, outcome-aware memory for AI decision agents, backed by SurrealDB.
 
 DecisionMemory records decisions and outcomes, recalls relevant prior decisions, tracks behavioral state, and exposes its workflows through MCP, REST, and CLI interfaces. The repository includes a lightweight SurrealDB CLI and an experimental LanceDB/FastEmbed component.
 
@@ -10,7 +10,7 @@ DecisionMemory records decisions and outcomes, recalls relevant prior decisions,
 - Outcome-weighted and optional vector-assisted recall
 - SHA-256 decision audit chains and daily Merkle roots
 - Decision-Making plans, behavioral analysis, legitimacy checks, and strategy validation
-- SQLite by default or SurrealDB tables prefixed with `tm_`
+- SurrealDB tables prefixed with `tm_`
 - MCP server, REST API, and management CLI
 - Database-manager skill instructions and Rust source
 
@@ -39,11 +39,10 @@ Start a local authenticated SurrealDB instance in another terminal:
 
 Set `INSTALL_SURREAL=0` before setup to skip automatic SurrealDB installation.
 
-Then select the shared backend:
+Then configure the shared database:
 
 ```bash
 cp .env.example .env
-export DECISIONMEMORY_BACKEND=surreal
 export SURREAL_USER=root
 export SURREAL_PASS=secret
 export SURREAL_NS=antigravity

@@ -196,7 +196,7 @@ Returns disposition ratio, hold time asymmetry, lot sizing variance vs Kelly cri
 
 **Environment variables:** All environment variables are optional. They are stored in your local `.env` file and never logged or sent to external services (except `ANTHROPIC_API_KEY` which authenticates with the Anthropic API).
 
-**File system access:** DecisionMemory writes to a single SQLite database file (`decisionmemory.db`), or to SurrealDB when `DECISIONMEMORY_BACKEND=surreal`. No files are created or modified outside the project.
+**File system access:** DecisionMemory writes to a single SurrealDB database file (`decisionmemory.db`), or to SurrealDB when `DECISIONMEMORY_BACKEND=surreal`. No files are created or modified outside the project.
 
 **No implicit permissions:** This skill does not auto-install dependencies, modify system files, or require elevated privileges.
 

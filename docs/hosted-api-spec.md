@@ -514,7 +514,7 @@ Each API key belongs to one account. Accounts are fully isolated:
 
 ## Migration from Self-Hosted
 
-For users migrating from the local SQLite-based setup:
+For users migrating from the local SurrealDB-based setup:
 
 1. Export decisions: `GET /decisions?limit=10000` from local server
 2. Bulk import: `POST /decisions/import` (accepts array of decision objects, max 500 per request)

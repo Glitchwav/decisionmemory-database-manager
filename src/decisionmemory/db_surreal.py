@@ -1,9 +1,7 @@
 """
 SurrealDB backend for DecisionMemory Protocol.
-Drop-in replacement for the SQLite Database class.
 Tables are prefixed with tm_ to coexist with other data in the same namespace.
 
-Set DECISIONMEMORY_BACKEND=surreal to activate via db_factory.
 No encryption at rest.
 """
 
@@ -51,7 +49,7 @@ class SurrealRow:
 
 
 class SurrealCursor:
-    """Mimics sqlite3 cursor with fetchone/fetchall."""
+    """Cursor-compatible result wrapper."""
 
     def __init__(self, rows: list[SurrealRow]):
         self._rows = rows
@@ -86,7 +84,7 @@ def _convert_record_ids(obj):
 
 
 class SurrealConnection:
-    """Wraps a SurrealDB connection to mimic sqlite3.Connection for ChainBuilder.
+    """Wraps a SurrealDB connection for ChainBuilder.
 
     Handles the specific SQL patterns used by ChainBuilder:
     - SELECT cols FROM table WHERE ... ORDER BY ... LIMIT N
@@ -343,7 +341,7 @@ class SurrealConnection:
 
 
 # ---------------------------------------------------------------------------
-# SurrealDatabase — full replacement for the SQLite Database class
+# SurrealDatabase
 # ---------------------------------------------------------------------------
 
 class SurrealDatabase:
@@ -834,7 +832,7 @@ class SurrealDatabase:
                 raise ValueError("episodic data must have an id")
             # Store id as regular field for query compatibility
             d['id'] = mem_id
-            # Check existence — plain INSERT fails on duplicate (like SQLite)
+            # Check existence — plain INSERT fails on duplicate (like SurrealDB)
             existing = self._q(
                 'SELECT id FROM type::thing($tbl, $rid)',
                 {'tbl': 'tm_episodic_memory', 'rid': mem_id},

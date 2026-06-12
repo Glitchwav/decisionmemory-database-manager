@@ -2,7 +2,7 @@
 Backtest Importer - Parse MT5 Strategy Tester HTML reports and import as DecisionRecords.
 
 Reads UTF-16LE HTML reports from MT5 Strategy Tester, pairs entry/exit deals,
-and bulk-imports them into decisionmemory SQLite database.
+and bulk-imports them into decisionmemory SurrealDB database.
 
 All imported decisions have source="backtest" in their reasoning field.
 """
@@ -219,7 +219,7 @@ def import_batch(
 
     Args:
         report_dir: Directory containing *_report.htm files
-        db_path: Path to decisionmemory SQLite database
+        db_path: Path to decisionmemory SurrealDB database
         manifest_path: Optional manifest.csv for variant metadata
 
     Returns:
@@ -286,7 +286,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Usage: python -m decisionmemory.backtest_importer <report_dir> [db_path]")
         print("  report_dir: Directory with *_report.htm files")
-        print("  db_path: decisionmemory SQLite DB (default: data/decisionmemory.db)")
+        print("  db_path: decisionmemory SurrealDB DB (default: data/decisionmemory.db)")
         sys.exit(1)
 
     report_dir = sys.argv[1]

@@ -1,4 +1,4 @@
-"""Initial schema — 9 tables from SQLite migrated to PostgreSQL.
+"""Initial schema — 9 tables from SurrealDB migrated to PostgreSQL.
 
 Revision ID: 001
 Revises: (none)

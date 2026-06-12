@@ -9,7 +9,7 @@ Usage:
 
 import json
 import math
-import sqlite3
+import surrealdb
 import sys
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -87,7 +87,7 @@ def compute_wr(decisions: list[dict]) -> float:
     return round(wins / len(decisions), 3)
 
 
-def load_buy_decisions(conn: sqlite3.Connection) -> list[dict]:
+def load_buy_decisions(conn: surrealdb.Connection) -> list[dict]:
     """Load all BUY decisions for the 3 strategies, sorted by timestamp."""
     cur = conn.cursor()
     cur.execute(
@@ -105,7 +105,7 @@ def load_buy_decisions(conn: sqlite3.Connection) -> list[dict]:
     return [dict(zip(cols, row)) for row in rows]
 
 
-def load_all_decisions_count(conn: sqlite3.Connection) -> int:
+def load_all_decisions_count(conn: surrealdb.Connection) -> int:
     cur = conn.cursor()
     cur.execute("SELECT COUNT(*) FROM decision_records")
     return cur.fetchone()[0]
@@ -418,7 +418,7 @@ def gen_confidence_cal(decisions: list[dict]) -> list[dict]:
     return buckets
 
 
-def gen_beliefs(conn: sqlite3.Connection) -> list[dict]:
+def gen_beliefs(conn: surrealdb.Connection) -> list[dict]:
     """Generate beliefs from patterns table."""
     cur = conn.cursor()
     cur.execute("SELECT * FROM patterns")
@@ -468,7 +468,7 @@ def gen_beliefs(conn: sqlite3.Connection) -> list[dict]:
     return beliefs
 
 
-def gen_adjustments(conn: sqlite3.Connection) -> list[dict]:
+def gen_adjustments(conn: surrealdb.Connection) -> list[dict]:
     """Generate adjustments from strategy_adjustments table."""
     cur = conn.cursor()
     cur.execute("SELECT * FROM strategy_adjustments")
@@ -604,7 +604,7 @@ def main():
         print(f"ERROR: Database not found at {DB_PATH}")
         sys.exit(1)
 
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = surrealdb.connect(str(DB_PATH))
     try:
         decisions = load_buy_decisions(conn)
         total_all = load_all_decisions_count(conn)

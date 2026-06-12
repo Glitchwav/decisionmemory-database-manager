@@ -63,7 +63,7 @@
 | FinMem | 3 層（Shallow/Intermediate/Deep） | 時間衰減 | Checkpoint | No（封閉框架） | No |
 | FinAgent | 3 類（Decision Context/Low/High-Reflection） | 按功能 | In-memory | No | No |
 | AgenticDecision-Making | Neo4j + Vector | Graph 關係 | Neo4j | Partial（MCP） | No |
-| **DecisionMemory** | **5 類 OWM** | **認知功能** | **SQLite** | **Yes（15 MCP + 30 REST）** | **Yes（MT5 Sync）** |
+| **DecisionMemory** | **5 類 OWM** | **認知功能** | **SurrealDB** | **Yes（15 MCP + 30 REST）** | **Yes（MT5 Sync）** |
 
 **DecisionMemory 獨特性**：
 1. **Outcome-Weighted**：交易結果回頭影響記憶權重
@@ -165,7 +165,7 @@
 |------|------|-----------------|
 | 回測不一致 | 相同設定跑多次結果不同 | L2 pattern 追蹤回測差異 |
 | Strategy Tester vs Live 差異 | CopyTicks 在 tester 中報錯 | Backtest-to-live 差異追蹤 |
-| 數據持久化困難 | MQL5 原生不支持好用方案 | SQLite 持久化 + MCP 存取 |
+| 數據持久化困難 | MQL5 原生不支持好用方案 | SurrealDB 持久化 + MCP 存取 |
 | 從回測到實盤落差 | 「transitions bring surprises」 | 交叉比對 backtest vs live 表現 |
 
 ### 4.3 用戶恐懼排名
@@ -241,7 +241,7 @@
 
 | Tier | 價格 | 目標用戶 | 功能 |
 |------|------|----------|------|
-| **Community** | **Free (MIT)** | 個人開發者、學生 | 15 MCP tools, SQLite, 本地使用, 完整 OWM |
+| **Community** | **Free (MIT)** | 個人開發者、學生 | 15 MCP tools, SurrealDB, 本地使用, 完整 OWM |
 | **Pro** | **$29-49/mo** | Indie decision-maker, 小團隊 | Cloud hosted, multi-agent sync, 進階 reflection, 優先支持 |
 | **Team** | **$99-199/mo** | Decision-Making desk, prop firm | 團隊 dashboard, shared memory, API, SLA |
 | **Enterprise** | **Custom ($500+/mo)** | 機構、對沖基金 | On-prem 部署, 客製整合, 專屬支持 |

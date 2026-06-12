@@ -76,7 +76,7 @@ DecisionMemory uses a three-layer architecture:
 |-------|------|---------------|---------|
 | **L1** | Hot Memory | Active decisions, current session | "XAUUSD long @ 2847, conf 0.78" |
 | **L2** | Warm Memory | Discovered patterns, insights | "London VolBreakout: 73% win rate" |
-| **L3** | Cold Memory | Full decision history (SQLite) | All 30 decisions with complete context |
+| **L3** | Cold Memory | Full decision history (SurrealDB) | All 30 decisions with complete context |
 
 **Key insight:** Most AI agents only have L1 (current context). DecisionMemory adds L2 and L3, so the agent builds knowledge over time.
 

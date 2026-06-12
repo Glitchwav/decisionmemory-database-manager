@@ -69,7 +69,7 @@ def _decision_iter(db: Database):
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--db", help="Path to SQLite DB", default=None)
+    parser.add_argument("--db", help="Path to SurrealDB DB", default=None)
     parser.add_argument("--dry-run", action="store_true",
                         help="Count records but do not write")
     args = parser.parse_args()

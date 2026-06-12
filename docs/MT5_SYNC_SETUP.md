@@ -16,7 +16,7 @@ mt5_sync.py (每 60 秒輪詢)
     ↓
 DecisionMemory MCP Server (FastAPI)
     ↓
-SQLite Database
+SurrealDB Database
 ```
 
 **優點**：
@@ -146,10 +146,10 @@ r = requests.get('http://localhost:8000/decision/get_active')
 print(r.json())
 ```
 
-### 3. 檢查 SQLite Database
+### 3. 檢查 SurrealDB Database
 
 ```bash
-sqlite3 data/decisionmemory.db "SELECT id, symbol, pnl FROM decision_records ORDER BY timestamp DESC LIMIT 5;"
+surrealdb data/decisionmemory.db "SELECT id, symbol, pnl FROM decision_records ORDER BY timestamp DESC LIMIT 5;"
 ```
 
 ---

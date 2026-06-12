@@ -97,7 +97,7 @@ DecisionMemory Protocol 是 Mnemox AI 的核心產品。MT5/forex 交易記憶�
 - **DQS Engine**: 5 continuous factors + 4-tier system (go/proceed/caution/skip) + calibrate() + integrated into remember_decision
 - **5 層記憶真正互通**：Semantic↔Episodic（drift detection → BOCPD），Procedural（hold time/Kelly/disposition），Affective←Procedural（behavioral risk）
 - **db.py 重構**：DecisionMemoryDBError 階層 + get_connection() context manager + 18→2 return False
-- **4 ADR** in docs/adr/ — OWM scoring, SQLite, MCP protocol, Evolution gates
+- **4 ADR** in docs/adr/ — OWM scoring, SurrealDB, MCP protocol, Evolution gates
 - **OWM 技術文章**草稿 in docs/research/owm-technical-article.md
 - **Strategy Validator 三層完成**：L1 MCP Tool + L2 Claude Code Skill + L3 Web UI (mnemox.ai/validate)
 - **PR #2 open** — ElishaKay: Fronteir AI hosted deployment link（外部貢獻，待 review）

@@ -1,6 +1,6 @@
 ---
 name: database-manager
-description: Use for DecisionMemory persistent storage, SurrealDB setup and queries, LanceDB installation checks, semantic-index experiments, and troubleshooting the shared antigravity/unified database. Use when recording or retrieving structured memories, selecting SQLite versus SurrealDB, checking database health, or building the packaged database-manager CLIs.
+description: Use for DecisionMemory persistent storage, SurrealDB setup and queries, LanceDB installation checks, semantic-index experiments, database health checks, and building the packaged database-manager CLIs.
 ---
 
 # Database Manager
@@ -18,12 +18,9 @@ From the repository root:
 
 Never install dependencies or start a service without telling the user what will be downloaded or launched.
 
-## Backend Selection
-
-SQLite is the default. To use SurrealDB:
+## Backend Configuration
 
 ```bash
-export DECISIONMEMORY_BACKEND=surreal
 export SURREAL_HOST=http://localhost
 export SURREAL_PORT=8000
 export SURREAL_USER=root

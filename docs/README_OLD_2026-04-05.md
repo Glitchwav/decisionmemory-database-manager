@@ -33,7 +33,7 @@ Every AI decision-making tool executes decisions. None of them record **why**. D
 
 ## When to use DecisionMemory vs alternatives
 
-| | DecisionMemory | Raw Mem0/Qdrant | LangChain Memory | Custom SQLite |
+| | DecisionMemory | Raw Mem0/Qdrant | LangChain Memory | Custom SurrealDB |
 |---|---|---|---|---|
 | **Decision audit trail** | ✅ SHA-256 + TDR | ❌ None | ❌ None | ❌ DIY |
 | **Decision-specific schema** | ✅ L1→L2→L3 pipeline | ❌ Generic vectors | ❌ Chat-oriented | ❌ DIY everything |
