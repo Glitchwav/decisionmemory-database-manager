@@ -1,0 +1,28 @@
+"""XAUUSD LLM DecisionMaking Agent Replay Engine.
+
+Replays historical XAUUSD M15 K-line data through an LLM agent,
+producing structured decision_making decisions with reasoning traces.
+"""
+
+from .engine import ReplayEngine, run_replay
+from .models import (
+    AgentDecision,
+    Bar,
+    DecisionType,
+    IndicatorSnapshot,
+    Position,
+    PositionState,
+    ReplayConfig,
+)
+
+__all__ = [
+    "AgentDecision",
+    "Bar",
+    "DecisionType",
+    "IndicatorSnapshot",
+    "Position",
+    "PositionState",
+    "ReplayConfig",
+    "ReplayEngine",
+    "run_replay",
+]

@@ -1,0 +1,266 @@
+"""DecisionMaking Decision Record (TDR) — MiFID II / EU AI Act inspired audit schema.
+
+Provides a complete, tamper-evident record of every decision_making decision made by
+an AI agent, including the memory context that informed the decision.
+"""
+
+import hashlib
+import json
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field, computed_field
+
+
+class MemoryContext(BaseModel):
+    """Memory layer context consulted at decision time."""
+    similar_decisions: List[str] = Field(
+        default_factory=list,
+        description="IDs of similar historical decisions retrieved via OWM recall",
+    )
+    relevant_beliefs: List[str] = Field(
+        default_factory=list,
+        description="Semantic memory propositions consulted (L2 beliefs)",
+    )
+    anti_resonance_applied: bool = Field(
+        default=False,
+        description=(
+            "True iff recall_consonance_score < APPLIED_THRESHOLD — i.e. recalled "
+            "evidence opposes the proposed direction enough to warrant a flag. "
+            "See owm/anti_resonance.py."
+        ),
+    )
+    recall_consonance_score: Optional[float] = Field(
+        default=None,
+        ge=0.0, le=1.0,
+        description=(
+            "Recall consonance in [0, 1]. 1.0 = recall evidence fully supports "
+            "the proposed direction; 0.0 = fully opposes. None = no proposed "
+            "direction or no usable refs."
+        ),
+    )
+    evidence_supporting_count: int = Field(
+        default=0,
+        description="Refs whose outcome supports the proposed direction.",
+    )
+    evidence_opposing_count: int = Field(
+        default=0,
+        description="Refs whose outcome opposes the proposed direction.",
+    )
+    suppression_recommended: bool = Field(
+        default=False,
+        description=(
+            "True iff recall_consonance_score < SUPPRESS_THRESHOLD — recall "
+            "strongly opposes; downstream agent should consider blocking the decision."
+        ),
+    )
+    negative_ratio: Optional[float] = Field(
+        default=None,
+        ge=0.0, le=1.0,
+        description=(
+            "Fraction of refs with pnl_r < 0 (recall balance signal; see "
+            "hybrid_recall.ensure_negative_balance)."
+        ),
+    )
+    recall_count: int = Field(
+        default=0,
+        description="Number of memories retrieved in recall",
+    )
+
+
+class RiskSnapshot(BaseModel):
+    """Risk parameters at decision time."""
+    position_size: Optional[float] = None
+    risk_per_decision: Optional[float] = Field(
+        default=None, description="Risk in account currency (SL distance * lots * contract)"
+    )
+    risk_percent: Optional[float] = Field(
+        default=None, description="Risk as % of account score"
+    )
+    max_loss_points: Optional[float] = Field(
+        default=None, description="SL distance in price points"
+    )
+
+
+class MarketSnapshot(BaseModel):
+    """Market state at decision time."""
+    price: Optional[float] = None
+    session: Optional[str] = None
+    regime: Optional[str] = None
+    atr_m5: Optional[float] = None
+    atr_h1: Optional[float] = None
+    atr_d1: Optional[float] = None
+    spread_points: Optional[int] = None
+    ema_fast_h1: Optional[float] = None
+    ema_slow_h1: Optional[float] = None
+
+
+class DecisionMakingDecisionRecord(BaseModel):
+    """Complete audit record for a single decision_making decision.
+
+    Inspired by:
+    - MiFID II Article 17: algorithmic decision_making record-keeping
+    - EU AI Act Article 14: human oversight of high-risk AI systems
+
+    Every field is immutable after creation. The data_hash provides
+    tamper detection — recompute and compare to verify integrity.
+    """
+
+    # --- Identity ---
+    record_id: str = Field(..., description="Unique, immutable (matches decision_id)")
+    timestamp: datetime = Field(..., description="Decision timestamp (UTC)")
+    agent_id: str = Field(default="mt5_sync_v3", description="Which agent/EA made this decision")
+    model_version: str = Field(default="0.5.1", description="DecisionMemory version at decision time")
+
+    # --- Decision ---
+    decision_type: str = Field(
+        ..., description="ENTRY | EXIT | HOLD | SKIP",
+        pattern="^(ENTRY|EXIT|HOLD|SKIP)$",
+    )
+    symbol: str
+    direction: Optional[str] = Field(default=None, description="long | short")
+    strategy: str
+
+    # --- Context (WHY) ---
+    signal_source: str = Field(
+        default="", description="What triggered the decision (e.g., 'VolBreakout bar confirmed')"
+    )
+    confidence_score: float = Field(
+        ..., ge=0.0, le=1.0, description="Agent confidence at decision time"
+    )
+    market: MarketSnapshot = Field(default_factory=MarketSnapshot)
+
+    # --- Memory (WHAT informed this) ---
+    memory: MemoryContext = Field(default_factory=MemoryContext)
+
+    # --- Risk ---
+    risk: RiskSnapshot = Field(default_factory=RiskSnapshot)
+
+    # --- Outcome (filled on exit) ---
+    exit_timestamp: Optional[datetime] = None
+    exit_reason: Optional[str] = Field(
+        default=None, description="SL | TP | TIMEOUT | MANUAL | EA_CLOSE"
+    )
+    pnl: Optional[float] = None
+    pnl_r: Optional[float] = None
+    hold_duration_minutes: Optional[int] = None
+
+    # --- Audit ---
+    data_hash: str = Field(
+        default="",
+        description="SHA256 of input features at decision time (tamper detection)",
+    )
+
+    @staticmethod
+    def compute_hash(
+        decision_id: str,
+        timestamp: str,
+        symbol: str,
+        direction: str,
+        strategy: str,
+        confidence: float,
+        reasoning: str,
+        market_context: Any,
+    ) -> str:
+        """Compute deterministic SHA256 hash of decision inputs.
+
+        Call this at record creation time and store the result.
+        To verify integrity later, recompute and compare.
+        """
+        payload = json.dumps(
+            {
+                "decision_id": decision_id,
+                "timestamp": str(timestamp),
+                "symbol": symbol,
+                "direction": direction,
+                "strategy": strategy,
+                "confidence": confidence,
+                "reasoning": reasoning,
+                "market_context": market_context,
+            },
+            sort_keys=True,
+            ensure_ascii=True,
+        )
+        return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+    @classmethod
+    def from_decision_record(
+        cls,
+        decision: Dict[str, Any],
+        memory_ctx: Optional[MemoryContext] = None,
+    ) -> "DecisionMakingDecisionRecord":
+        """Build a TDR from an existing decision_records row + optional memory context.
+
+        This is the main factory method used by the /audit/ endpoints.
+        """
+        market_context = decision.get("market_context") or {}
+        if isinstance(market_context, str):
+            market_context = json.loads(market_context)
+
+        event_log = market_context.get("event_log", {})
+        regime_data = market_context.get("regime", {})
+
+        # JSONL decision context (richer than CSV event_log)
+        decision_data = market_context.get("decision_data", {})
+        decision_indicators = decision_data.get("indicators", {})
+
+        # Prefer JSONL indicators > CSV event_log > regime file
+        market = MarketSnapshot(
+            price=market_context.get("price"),
+            session=market_context.get("session"),
+            regime=regime_data.get("regime"),
+            atr_m5=decision_indicators.get("atr_m5") or event_log.get("atr_m5"),
+            atr_h1=decision_indicators.get("atr_h1") or regime_data.get("atr_h1"),
+            atr_d1=decision_indicators.get("atr_d1") or regime_data.get("atr_d1"),
+            spread_points=(
+                decision_indicators.get("spread_pts")
+                or decision_data.get("spread_points")
+                or event_log.get("spread_points")
+            ),
+            ema_fast_h1=decision_indicators.get("ema_fast_h1") or event_log.get("ema_fast_h1"),
+            ema_slow_h1=decision_indicators.get("ema_slow_h1") or event_log.get("ema_slow_h1"),
+        )
+
+        # Compute data_hash from original inputs
+        data_hash = cls.compute_hash(
+            decision_id=decision.get("id", ""),
+            timestamp=decision.get("timestamp", ""),
+            symbol=decision.get("symbol", ""),
+            direction=decision.get("direction", ""),
+            strategy=decision.get("strategy", ""),
+            confidence=decision.get("confidence", 0.0),
+            reasoning=decision.get("reasoning", ""),
+            market_context=market_context,
+        )
+
+        # Parse references into memory context
+        refs = decision.get("references", [])
+        if isinstance(refs, str):
+            refs = json.loads(refs)
+
+        mem = memory_ctx or MemoryContext(similar_decisions=refs)
+        if not memory_ctx and refs:
+            mem.similar_decisions = refs
+            mem.recall_count = len(refs)
+
+        return cls(
+            record_id=decision.get("id", ""),
+            timestamp=decision.get("timestamp", datetime.min),
+            decision_type="ENTRY",
+            symbol=decision.get("symbol", ""),
+            direction=decision.get("direction"),
+            strategy=decision.get("strategy", ""),
+            signal_source=decision.get("reasoning", ""),
+            confidence_score=decision.get("confidence", 0.0),
+            market=market,
+            memory=mem,
+            risk=RiskSnapshot(
+                position_size=decision.get("lot_size"),
+            ),
+            exit_timestamp=decision.get("exit_timestamp"),
+            exit_reason=decision.get("exit_reasoning"),
+            pnl=decision.get("pnl"),
+            pnl_r=decision.get("pnl_r"),
+            hold_duration_minutes=decision.get("hold_duration"),
+            data_hash=data_hash,
+        )

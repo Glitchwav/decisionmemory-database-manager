@@ -1,0 +1,13 @@
+
+== Step 2: L2 - Reflection Engine discovers patterns ==
+
+  Pattern                | Win Rate |     Record |    Net P&L | Assessment
+  london session         |     100% | 7W / 0L   | $ +296.50 | HIGH EDGE
+  newyork session        |       0% | 0W / 1L   | $  -18.00 | WEAK
+  asian session          |       0% | 0W / 4L   | $  -69.00 | WEAK
+  VolBreakout strategy   |      83% | 5W / 1L   | $ +215.50 | HIGH EDGE
+  Pullback strategy      |      33% | 2W / 4L   | $   -6.00 | WEAK
+
+  Confidence correlation:
+    High (>=0.75): 100% win rate
+    Low  (<0.55):  0% win rate

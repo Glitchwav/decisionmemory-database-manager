@@ -1,0 +1,17 @@
+== Step 1: L1 - Recording decisions to DecisionJournal ==
+
+    # | Result | Session  | Strategy     |       P&L |     R
+    1 | LOSS   | asian    | Pullback     |   $-15.00 | -1.0
+    2 | WIN    | london   | VolBreakout  |   $+42.00 | +2.1
+    3 | WIN    | london   | VolBreakout  |   $+28.50 | +1.5
+    4 | LOSS   | asian    | Pullback     |   $-20.00 | -1.0
+    5 | WIN    | london   | VolBreakout  |   $+55.00 | +2.8
+    6 | WIN    | london   | Pullback     |   $+35.00 | +1.8
+    7 | LOSS   | newyork  | VolBreakout  |   $-18.00 | -0.9
+    8 | LOSS   | asian    | Pullback     |   $-22.00 | -1.1
+    9 | WIN    | london   | VolBreakout  |   $+60.00 | +3.0
+   10 | LOSS   | asian    | Pullback     |   $-12.00 | -0.6
+   11 | WIN    | london   | VolBreakout  |   $+48.00 | +2.4
+   12 | WIN    | london   | Pullback     |   $+28.00 | +1.4
+
+  Total: 12 decisions | Winners: 7 | Win rate: 58% | Net P&L: $+209.50

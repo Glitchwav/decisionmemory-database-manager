@@ -1,0 +1,162 @@
+[
+  {
+    "date": "2025-10-06",
+    "type": "weekly_review",
+    "grade": "B",
+    "strategy": "VolBreakout",
+    "summary": "Week of 2025-10-06: 72 decisions, PnL $+11150.11, WR 57%. Primary strategy: VolBreakout.",
+    "full_path": "weekly_reviews/2025-10-06_weekly.md"
+  },
+  {
+    "date": "2025-10-13",
+    "type": "weekly_review",
+    "grade": "A",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2025-10-13: 97 decisions, PnL $+22479.33, WR 70%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2025-10-13_weekly.md"
+  },
+  {
+    "date": "2025-10-20",
+    "type": "weekly_review",
+    "grade": "D",
+    "strategy": "VolBreakout",
+    "summary": "Week of 2025-10-20: 16 decisions, PnL $-2306.40, WR 0%. Primary strategy: VolBreakout.",
+    "full_path": "weekly_reviews/2025-10-20_weekly.md"
+  },
+  {
+    "date": "2025-10-27",
+    "type": "weekly_review",
+    "grade": "B",
+    "strategy": "VolBreakout",
+    "summary": "Week of 2025-10-27: 19 decisions, PnL $+3206.45, WR 58%. Primary strategy: VolBreakout.",
+    "full_path": "weekly_reviews/2025-10-27_weekly.md"
+  },
+  {
+    "date": "2025-11-03",
+    "type": "weekly_review",
+    "grade": "A",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2025-11-03: 26 decisions, PnL $+5569.67, WR 100%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2025-11-03_weekly.md"
+  },
+  {
+    "date": "2025-11-10",
+    "type": "weekly_review",
+    "grade": "B",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2025-11-10: 54 decisions, PnL $+7423.25, WR 46%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2025-11-10_weekly.md"
+  },
+  {
+    "date": "2025-11-17",
+    "type": "weekly_review",
+    "grade": "D",
+    "strategy": "VolBreakout",
+    "summary": "Week of 2025-11-17: 16 decisions, PnL $-4760.76, WR 0%. Primary strategy: VolBreakout.",
+    "full_path": "weekly_reviews/2025-11-17_weekly.md"
+  },
+  {
+    "date": "2025-12-01",
+    "type": "weekly_review",
+    "grade": "D",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2025-12-01: 35 decisions, PnL $-5808.18, WR 11%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2025-12-01_weekly.md"
+  },
+  {
+    "date": "2025-12-08",
+    "type": "weekly_review",
+    "grade": "A",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2025-12-08: 36 decisions, PnL $+2068.20, WR 72%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2025-12-08_weekly.md"
+  },
+  {
+    "date": "2025-12-15",
+    "type": "weekly_review",
+    "grade": "D",
+    "strategy": "VolBreakout",
+    "summary": "Week of 2025-12-15: 51 decisions, PnL $-14213.35, WR 0%. Primary strategy: VolBreakout.",
+    "full_path": "weekly_reviews/2025-12-15_weekly.md"
+  },
+  {
+    "date": "2025-12-22",
+    "type": "weekly_review",
+    "grade": "B",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2025-12-22: 52 decisions, PnL $+2826.64, WR 42%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2025-12-22_weekly.md"
+  },
+  {
+    "date": "2025-12-29",
+    "type": "weekly_review",
+    "grade": "B",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2025-12-29: 65 decisions, PnL $+260.11, WR 28%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2025-12-29_weekly.md"
+  },
+  {
+    "date": "2026-01-05",
+    "type": "weekly_review",
+    "grade": "A",
+    "strategy": "VolBreakout",
+    "summary": "Week of 2026-01-05: 16 decisions, PnL $+1932.20, WR 100%. Primary strategy: VolBreakout.",
+    "full_path": "weekly_reviews/2026-01-05_weekly.md"
+  },
+  {
+    "date": "2026-01-12",
+    "type": "weekly_review",
+    "grade": "B",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2026-01-12: 30 decisions, PnL $+8225.58, WR 40%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2026-01-12_weekly.md"
+  },
+  {
+    "date": "2026-01-19",
+    "type": "weekly_review",
+    "grade": "A",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2026-01-19: 80 decisions, PnL $+24711.94, WR 78%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2026-01-19_weekly.md"
+  },
+  {
+    "date": "2026-01-26",
+    "type": "weekly_review",
+    "grade": "B",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2026-01-26: 77 decisions, PnL $+20744.10, WR 58%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2026-01-26_weekly.md"
+  },
+  {
+    "date": "2026-02-02",
+    "type": "weekly_review",
+    "grade": "A",
+    "strategy": "VolBreakout",
+    "summary": "Week of 2026-02-02: 48 decisions, PnL $+8019.14, WR 100%. Primary strategy: VolBreakout.",
+    "full_path": "weekly_reviews/2026-02-02_weekly.md"
+  },
+  {
+    "date": "2026-02-09",
+    "type": "weekly_review",
+    "grade": "D",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2026-02-09: 18 decisions, PnL $-443.70, WR 0%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2026-02-09_weekly.md"
+  },
+  {
+    "date": "2026-02-16",
+    "type": "weekly_review",
+    "grade": "D",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2026-02-16: 18 decisions, PnL $-442.98, WR 0%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2026-02-16_weekly.md"
+  },
+  {
+    "date": "2026-02-23",
+    "type": "weekly_review",
+    "grade": "C",
+    "strategy": "IntradayMomentum",
+    "summary": "Week of 2026-02-23: 38 decisions, PnL $-1177.60, WR 32%. Primary strategy: IntradayMomentum.",
+    "full_path": "weekly_reviews/2026-02-23_weekly.md"
+  }
+]

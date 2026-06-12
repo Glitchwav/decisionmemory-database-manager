@@ -1,0 +1,226 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+Format follows [Keep a Changelog](https://keepachangelog.com/).
+
+---
+
+## [0.5.2] - 2026-05-14
+
+### Added
+- **Audit chain (`audit/`).** Per-record content hashes are now linked into a
+  forward-chained SHA-256 chain (`chained_hash = SHA256(prev_hash || content_hash)`)
+  with a genesis block (`0` * 64). Tampering with any historical record
+  invalidates every subsequent link.
+  - `audit_chain` table: `record_id`, `sequence_num`, `content_hash`,
+    `prev_hash`, `data_hash`, `chained_at`.
+  - `audit_roots` table: daily UTC Merkle roots over `audit_chain.data_hash`,
+    themselves chained via `prev_root_hash`. `tsa_token` BLOB reserved for
+    RFC 3161 (Phase 1.5).
+  - New MCP tools: `verify_audit_chain(from_seq, to_seq)`,
+    `get_daily_root(date, rebuild=False)`.
+  - Existing `verify_audit_hash(decision_id)` now also surfaces the chain entry.
+  - `Database.insert_decision` automatically appends to the chain on a fresh
+    insert; duplicate-id inserts skip the chain append.
+  - `scripts/backfill_audit_chain.py` deterministically rebuilds the chain
+    and daily roots from `decision_records` (ORDER BY timestamp, id).
+  - 25 new tests in `tests/test_audit_chain.py`.
+- **Anti-resonance (`owm/anti_resonance.py`) — real algorithm.** Computes a
+  `recall_consonance_score` in `[0, 1]` evaluating whether recalled refs
+  collectively support (1.0) or oppose (0.0) the proposed direction.
+  - `anti_resonance_applied = score < APPLIED_THRESHOLD` (default 0.4) — i.e.
+    counter-evidence dominates. `suppression_recommended = score < 0.2`.
+  - `MemoryContext` gains `recall_consonance_score`,
+    `evidence_supporting_count`, `evidence_opposing_count`, and
+    `suppression_recommended`.
+  - 25 new tests in `tests/test_anti_resonance.py`.
+- **`LIMITATIONS.md`** at repo root, linked from README. Documents validated
+  vs. research-stage components, architecture gaps (no auth, no multi-tenancy,
+  parallel DB stacks), provider / LLM coverage, and a per-area roadmap.
+
+### Changed
+- **`MemoryContext.anti_resonance_applied`** is no longer `len(refs) > 0`. It
+  is now derived from `compute_recall_consonance` against the proposed
+  direction. The three call sites (`mcp_server.py` x2 and `server.py`) all
+  funnel through a `_build_memory_context` helper.
+- TDR `MemoryContext` description updated to reflect the real semantic.
+
+### Fixed
+- The three call sites in `mcp_server.py` and `server.py` that set
+  `anti_resonance_applied = len(refs) > 0` — a behavioural lie that was
+  flagged in the pre-OTSO audit. The flag now reflects actual counter-evidence.
+
+### Notes
+- 1,428 tests pass on this release (+50 new, no regressions). 0 failures.
+- Phase 5 INVALID result is retained in the research log and now explicitly
+  documented in `LIMITATIONS.md` Section 1.
+
+---
+
+## [0.5.0] - 2026-03-16
+
+### Added
+- **Evolution Engine** — automated observe → hypothesize → backtest → select loop
+  - `src/decisionmemory/evolution/`: models, backtester, generator, selector, engine
+  - LLM-powered pattern discovery (Anthropic Sonnet) with structured JSON output
+  - Vectorized backtester: ATR-based SL/TP, long/short, time-based exit, dynamic Sharpe annualization
+  - Hypothesis generator: explore/exploit temperature control, graveyard-aware
+  - Selection & Elimination: IS rank → OOS validation (Sharpe > 1.0, decision_count > 30, max_dd < 20%)
+  - Evolution Orchestrator: multi-generation, configurable population_size/mutation_rate
+  - Strategy Graveyard for learning from failures
+- **OWM Completion** — all 5 memory types fully implemented
+  - Episodic decay: power-law S(t) = S₀ × (1 + t/τ)^(-d) × boost(n) with rehearsal boost
+  - Semantic decay: Bayesian Beta(α,β) posterior update, regime_match_factor, τ=180d
+  - Auto-induction: episodic patterns → semantic memory (check_auto_induction)
+  - Procedural drift: CUSUM detection for behavioral stats (holding time, SL/TP ratio, disposition)
+  - Affective EWMA: ewma_confidence (λ=0.9), risk_appetite linked to drawdown
+  - Prospective feedback: evaluate_trigger condition matching, record_outcome tracking
+- **Platform-Agnostic Data Layer** (Phase 9)
+  - DataSource Protocol (runtime_checkable): fetch_ohlcv(), available_symbols()
+  - Binance historical data adapter: REST API, rate limiting, parquet cache
+  - Context Builder: ATR, trend, volatility regime, time-of-day from OHLCVSeries
+  - MT5 CSV adapter: tab/comma auto-detect, DataSource Protocol wrapper
+  - OHLCV model, Timeframe enum, OHLCVSeries with IS/OOS split()
+- **Evolution MCP Tools** (Phase 11)
+  - 5 new MCP tools: fetch_decision context_data, discover_patterns, run_backtest, evolve_strategy, get_evolution_log
+  - 4 REST endpoints: POST /evolution/run, GET /evolution/runs, GET /evolution/runs/{id}, GET /evolution/graveyard
+  - 3 Pydantic response models
+- **Integration & Validation** (Phase 12)
+  - Evolution demo script: mock BTC 1H data, 3-generation evolution, text score curve
+  - Dashboard evolution page: surviving/graveyard tables, fitness trend, run summary
+  - Research log auto-write (EXP-00X format)
+- 656 new tests (1,055 total, up from 399)
+
+### Changed
+- All `from src.decisionmemory` imports fixed to `from decisionmemory` (180+ files)
+- Sharpe annualization now dynamic per timeframe (was hardcoded sqrt(252))
+- Trailing stop uses ATR; SL/TP takes priority over time-based exit
+
+### Stats
+- 15 MCP tools (was 10), 30+ REST endpoints
+- 1,055 tests passing, 0 failures
+- Phases 8-12 complete (P1: 42/42, P2: 20/20)
+
+---
+
+## [0.4.0] - 2026-03-05
+
+### Added
+- **Outcome-Weighted Memory (OWM)** — cognitive science-based recall system for AI decision-making agents
+  - 5 memory types: Episodic decision events, Semantic strategy rules, Procedural behavioral patterns, Affective confidence/risk state, Prospective conditional plans
+  - Core recall formula: `Score(m,C) = Q(m) * Sim(m,C) * Rec(m) * Conf(m) * Aff(m)`
+  - Based on ACT-R (Anderson 2007), Kelly Criterion (Kelly 1956), Bayesian updating, and Tulving's memory taxonomy
+- 6 new MCP tools (10 total):
+  - `remember_decision` — store decision with full OWM episodic encoding
+  - `recall_memories` — outcome-weighted recall with score breakdown
+  - `get_behavioral_analysis` — procedural memory behavioral bias detection
+  - `get_agent_state` — affective state (confidence, risk appetite, drawdown)
+  - `create_decision_plan` — prospective memory conditional plans
+  - `check_active_plans` — trigger condition matching against current context
+- Kelly-from-memory position sizing with fractional Kelly and risk appetite adjustment
+- `docs/OWM_FRAMEWORK.md` — 1,875-line theoretical specification
+- OWM data migration utility (`owm/migration.py`)
+- 5 new OWM database tables (episodic, semantic, procedural, affective, prospective)
+- 7 new REST API endpoints under `/owm/` prefix
+- 196 new tests (399 total)
+
+### Changed
+- `recall_similar_decisions` MCP tool now auto-upgrades to OWM formula when episodic data exists (falls back to original logic otherwise)
+- REST API server expanded with 7 new OWM endpoints under `/owm/` prefix
+
+### Migration
+- Zero breaking changes. All 4 original MCP tools work identically.
+- New OWM tools are additive — use them when ready.
+- Run `migration.py` to convert existing decision data to episodic format (optional).
+
+---
+
+## [0.3.1] - 2026-03-03
+
+### Added
+- `scripts/research/generate_screenshots.py` — generates demo output for documentation
+- `ROADMAP.md` — 5-phase development roadmap
+- OpenClaw Skill (`.skills/decisionmemory/SKILL.md`) with env var declarations and security section
+- Hosted API server (`hosted/server.py`) with account isolation and API key auth
+- Decision Contexting materials (`decision contexting/`) for Forex Factory, Reddit, MQL5
+
+### Changed
+- Repository reorganized: scripts, docs, and deploy configs moved to proper subdirectories
+- All path references updated across 25+ files
+- README architecture diagram replaced with Mermaid (GitHub-native rendering)
+- Test count unified across all documentation (203 tests)
+
+### Fixed
+- ClawHub security scan "Suspicious" marking — env vars now declared in Skill frontmatter
+- `test_hosted_server.py` import errors — added `pytest.importorskip("fastapi")`
+
+---
+
+## [0.3.0] - 2026-03-01
+
+### Added
+- **L3 Strategy Adjustments** — Rule-based strategy tuning from L2 patterns
+  - `strategy_adjustments` table in SQLite with proposed/approved/applied/rejected lifecycle
+  - 5 deterministic rules: strategy_disable, strategy_prefer, session_reduce, session_increase, direction_restrict
+  - `generate_l3_adjustments()` in ReflectionEngine — reads L2 patterns, outputs proposed adjustments
+  - 3 CRUD methods in Database: `insert_adjustment`, `query_adjustments`, `update_adjustment_status`
+  - 3 REST API endpoints: `POST /reflect/generate_adjustments`, `GET /adjustments/query`, `POST /adjustments/update_status`
+  - 21 new tests (CRUD, 5 rules, edge cases, integration)
+  - `demo.py` Step 6: production L1→L2→L3 pipeline
+- GitHub Actions CI — Python 3.10/3.11/3.12 matrix testing on push/PR
+- `scripts/research/record_demo.py` — Rich-formatted demo for terminal recording
+- `docs/AWESOME_LISTS.md` — Awesome list submission tracker
+- `SECURITY.md` — Vulnerability reporting policy
+- GitHub Discussions templates (Ideas, Show & Tell, Q&A)
+- `pyproject.toml` — Full PyPI metadata, `decisionmemory` CLI entry point
+
+### Changed
+- README rewritten: removed decision contexting tone, honest feature status, developer-focused
+- Removed internal docs from public repo (LAUNCH_STRATEGY, DEMO_STORYLINE, ARIADNG_UX_REVIEW)
+- CHANGELOG rewritten with honest timeline (no fake sprint numbering)
+- Phase 2 features clearly marked as "not yet implemented"
+- API.md emoji headers replaced with plain text
+
+### Removed
+- `docs/LAUNCH_STRATEGY.md` — Internal strategy document
+- `docs/DEMO_STORYLINE.md` — Internal planning document
+- `docs/ARIADNG_UX_REVIEW.md` — Internal review document
+- `docs/DEMO_RESULTS_TEMPLATE.md` — Unused template
+- Legacy `.md` issue templates (replaced by `.yml`)
+
+---
+
+## [0.1.0] - 2026-02-23
+
+Initial open-source release. Built over 2 days of intensive development.
+
+### Added
+- Core MCP server (FastAPI) with decision journal, reflection engine, state management
+- DecisionRecord and SessionState data models (Pydantic v2)
+- SQLite database with schema initialization
+- DecisionJournal — record decisions, outcomes, query history
+- ReflectionEngine — daily summary generation (rule-based + optional LLM)
+- LLM output validation with rule-based fallback
+- StateManager — cross-session persistence, warm memory, risk constraints
+- MT5 decision adapter — converts MetaDecision-Maker 5 deals to DecisionRecord format
+- MT5 sync service — polls for closed decisions every 60s
+- Streamlit monitoring dashboard
+- `demo.py` — Interactive demo with 30 simulated XAUUSD decisions (no API key needed)
+- `install.sh` — One-click install script
+- Dockerfile + docker-compose.yml
+- `.devcontainer/devcontainer.json` — GitHub Codespaces support
+- English and Chinese tutorials (`docs/TUTORIAL.md`, `docs/TUTORIAL_ZH.md`)
+- Before/After comparison document (`docs/BEFORE_AFTER.md`)
+- Architecture documentation (`docs/ARCHITECTURE.md`)
+- API reference, schema docs, reflection format docs
+- GitHub issue templates (bug report, feature request, question)
+- CONTRIBUTING.md, SECURITY.md
+- 111 unit tests (journal, state, reflection, models, LLM validation, adaptive risk, server)
+- Guarded `import MetaDecision-Maker5` for cross-platform compatibility
+- UTC timezone enforcement for all timestamps
+
+### Technical Decisions
+- Platform-agnostic core — MT5-specific code isolated in adapters
+- LLM outputs validated before entering L2 memory (garbage prevention)
+- Rule-based reflection fallback when no API key is configured
+- 3-layer memory: L1 (hot/RAM), L2 (warm/JSON), L3 (cold/SQLite)

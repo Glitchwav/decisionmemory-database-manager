@@ -1,0 +1,130 @@
+Changed text/metadata paths
+.github/CODEOWNERS
+.github/CONTRIBUTING.md
+.github/PULL_REQUEST_TEMPLATE.md
+.github/SECURITY.md
+.skills/decisionmemory/SKILL.md
+.skills/strategy-validator/SKILL.md
+README.md
+assets/fb_post_whale_fingerprint.md
+assets/generate_evolution.html
+assets/generate_evolution_zh.html
+assets/generate_header.html
+assets/generate_header_zh.html
+assets/generate_l1l2l3.html
+assets/generate_memory-pipeline_zh.html
+assets/generate_owm-factors_zh.html
+assets/generate_owm.html
+assets/generate_schema.html
+assets/generate_schema_zh.html
+assets/generate_whale_compare.html
+assets/screenshots/demo-full.txt
+assets/screenshots/demo-l1.txt
+assets/screenshots/demo-l2.txt
+assets/screenshots/demo-l3.txt
+decisionmemory-plugin/.claude-plugin/plugin.json
+decisionmemory-plugin/.mcp.json
+decisionmemory-plugin/README.md
+decisionmemory-plugin/commands/daily-review.md
+decisionmemory-plugin/commands/evolve.md
+decisionmemory-plugin/commands/performance.md
+decisionmemory-plugin/commands/recall.md
+decisionmemory-plugin/commands/record-decision.md
+decisionmemory-plugin/skills/decision-memory/SKILL.md
+decisionmemory-plugin/skills/evolution-engine/SKILL.md
+decisionmemory-plugin/skills/risk-management/SKILL.md
+docs/API.md
+docs/ARCHITECTURE.md
+docs/AWESOME_LISTS.md
+docs/BEFORE_AFTER.md
+docs/DAILY_REFLECTION_SETUP.md
+docs/EXECUTION_LOG.md
+docs/GETTING_STARTED.md
+docs/MT5_SYNC_SETUP.md
+docs/MT5_SYNC_V3.md
+docs/OWM_FRAMEWORK.md
+docs/QUICK_START.md
+docs/README_OLD_2026-04-05.md
+docs/README_ZH.md
+docs/REFLECTION_ENGINE_GUIDE.md
+docs/REFLECTION_FORMAT.md
+docs/RESEARCH_LOG.md
+docs/ROADMAP.md
+docs/SCHEMA.md
+docs/TDR_SPEC_v1.md
+docs/TUTORIAL.md
+docs/TUTORIAL_ZH.md
+docs/USE_CASES.md
+docs/VALIDATION_RESULTS.md
+docs/adr/001-owm-multiplicative-scoring.md
+docs/adr/002-sqlite-over-postgres.md
+docs/adr/003-mcp-protocol-choice.md
+docs/adr/004-evolution-statistical-gates.md
+docs/anti-resonance-package.md
+docs/article-adding-memory-to-ea.md
+docs/blog-evolution-experiment-zh.md
+docs/blog-evolution-experiment.md
+docs/decision-ai-failure-taxonomy.md
+docs/deployment.md
+docs/example_strategy_prompt.md
+docs/hosted-api-spec.md
+docs/marketing/demo-video-script.md
+docs/marketing/reddit-strategy.md
+docs/research/arxiv-paper-behavioral-drift.html
+docs/research/arxiv-paper-behavioral-drift.md
+docs/research/owm-technical-article.md
+docs/research/self-calibrating-agent-research-report.md
+docs/research/validation_step1_results.json
+docs/research/validation_step2_results.json
+docs/research/validation_step3_results.json
+docs/research/validation_step4_results.json
+docs/specs/2026-03-25-mcp-onboarding-design.md
+docs/superpowers/plans/2026-04-05-readme-rewrite.md
+docs/superpowers/specs/2026-04-05-readme-rewrite-design.md
+reports/analyze_decision-maker_meta_report.md
+reports/daily_2026-03-01.json
+reports/daily_2026-03-01.txt
+reports/decision-maker_fingerprint_MIXED_20260319.md
+reports/decision-maker_fingerprint_XAUUSD_20260318.md
+reports/distribution-steps.md
+reports/documentation-neutralization-paths.txt
+reports/market-research-2026-03.md
+reports/research-01-competitors.md
+reports/research-02-channels.md
+reports/research-03-painpoints.md
+reports/research-04-seo-pricing.md
+reports/weekly_2026-03-01.json
+reports/weekly_2026-03-01.txt
+research/README.md
+research/level2/compare_maxdd.json
+research/level2/h_sensitivity.json
+research/level2/paper-experiments-tasks.txt
+research/level2/robustness_no_btc1h.json
+skills/binance-skills-hub/decision-memory/SKILL.md
+skills/decisionmemory-bridge/SKILL.md
+./.mcp.json
+./CHANGELOG.md
+./CLAUDE.md
+./CODE_OF_CONDUCT.md
+./LIMITATIONS.md
+./README.md
+./TERMS.md
+./THIRD_PARTY_NOTICES.md
+./glama.json
+./llms.txt
+./requirements.txt
+./server.json
+./ssrt-phase2-spec.md
+./ssrt-spec.md
+
+Renamed paths
+docs/decision_making-ai-failure-taxonomy.md -> docs/decision-ai-failure-taxonomy.md
+reports/decision_maker_fingerprint_MIXED_20260319.md -> reports/decision-maker_fingerprint_MIXED_20260319.md
+reports/decision_maker_fingerprint_XAUUSD_20260318.md -> reports/decision-maker_fingerprint_XAUUSD_20260318.md
+reports/analyze_decision_maker_meta_report.md -> reports/analyze_decision-maker_meta_report.md
+skills/decisionmemory-bridge/ -> skills/decisionmemory-bridge/
+skills/binance-skills-hub/decision-memory/ -> skills/binance-skills-hub/decision-memory/
+.skills/decisionmemory/SKILL.md -> .skills/decisionmemory/SKILL.md
+decisionmemory-plugin/ -> decisionmemory-plugin/
+decisionmemory-plugin/commands/record-decision.md -> decisionmemory-plugin/commands/record-decision.md
+decisionmemory-plugin/skills/decision_making-memory/ -> decisionmemory-plugin/skills/decision-memory/

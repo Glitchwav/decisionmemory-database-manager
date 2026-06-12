@@ -1,0 +1,17 @@
+{
+  "_disclaimer": "⚠️ Generated from backtest data (2024.01-2026.02, n=10,169). Not live decision_making results.",
+  "total_decisions": 10169,
+  "total_pnl": 276535.25,
+  "win_rate": 0.447,
+  "profit_factor": 1.61,
+  "current_score": 286535.25,
+  "max_drawdown_pct": 0.4066,
+  "memory_count": 4102,
+  "avg_confidence": 0.5,
+  "last_decision_date": "2026-02-25T10:00:00+00:00",
+  "strategies": [
+    "IntradayMomentum",
+    "Pullback",
+    "VolBreakout"
+  ]
+}

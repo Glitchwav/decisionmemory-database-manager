@@ -1,0 +1,257 @@
+{
+  "_disclaimer": "⚠️ Generated from backtest data (2024.01-2026.02, n=10,169). Not live decision_making results.",
+  "name": "VolBreakout",
+  "total_decisions": 1701,
+  "win_rate": 0.477,
+  "profit_factor": 1.27,
+  "avg_pnl_r": 0.35,
+  "avg_hold_seconds": 2019,
+  "best_session": "London",
+  "worst_session": "Asia",
+  "baseline_pf": 1.17,
+  "baseline_wr": 0.55,
+  "decisions": [
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR2_BUF0.1-0136",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 186.88,
+      "pnl_r": 1.87,
+      "session": "Asia",
+      "hold_seconds": 5112
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR3_BUF0.1-0132",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 186.88,
+      "pnl_r": 1.87,
+      "session": "Asia",
+      "hold_seconds": 5112
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR4_BUF0.1-0130",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 186.88,
+      "pnl_r": 1.87,
+      "session": "Asia",
+      "hold_seconds": 5112
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR5_BUF0.1-0130",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 186.88,
+      "pnl_r": 1.87,
+      "session": "Asia",
+      "hold_seconds": 5112
+    },
+    {
+      "id": "BT-VB_XAUUSD_BOTH_RR2_BUF0.2-0154",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 159.03,
+      "pnl_r": 1.59,
+      "session": "London",
+      "hold_seconds": 5099
+    },
+    {
+      "id": "BT-VB_XAUUSD_BOTH_RR3_BUF0.2-0147",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 159.03,
+      "pnl_r": 1.59,
+      "session": "London",
+      "hold_seconds": 5099
+    },
+    {
+      "id": "BT-VB_XAUUSD_BOTH_RR4_BUF0.2-0146",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 159.03,
+      "pnl_r": 1.59,
+      "session": "London",
+      "hold_seconds": 5099
+    },
+    {
+      "id": "BT-VB_XAUUSD_BOTH_RR5_BUF0.2-0145",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 159.03,
+      "pnl_r": 1.59,
+      "session": "London",
+      "hold_seconds": 5099
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR2_BUF0.2-0093",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 159.03,
+      "pnl_r": 1.59,
+      "session": "London",
+      "hold_seconds": 5099
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR3_BUF0.2-0090",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 159.03,
+      "pnl_r": 1.59,
+      "session": "London",
+      "hold_seconds": 5099
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR4_BUF0.2-0090",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 159.03,
+      "pnl_r": 1.59,
+      "session": "London",
+      "hold_seconds": 5099
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR5_BUF0.2-0089",
+      "date": "2026-02-06",
+      "side": "BUY",
+      "pnl": 159.03,
+      "pnl_r": 1.59,
+      "session": "London",
+      "hold_seconds": 5099
+    },
+    {
+      "id": "BT-VB_XAUUSD_BOTH_RR2_BUF0.1-0221",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": -88.8,
+      "pnl_r": -0.89,
+      "session": "Asia",
+      "hold_seconds": 2230
+    },
+    {
+      "id": "BT-VB_XAUUSD_BOTH_RR3_BUF0.1-0209",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": -88.8,
+      "pnl_r": -0.89,
+      "session": "Asia",
+      "hold_seconds": 2230
+    },
+    {
+      "id": "BT-VB_XAUUSD_BOTH_RR4_BUF0.1-0203",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": -88.8,
+      "pnl_r": -0.89,
+      "session": "Asia",
+      "hold_seconds": 2230
+    },
+    {
+      "id": "BT-VB_XAUUSD_BOTH_RR5_BUF0.1-0201",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": -88.8,
+      "pnl_r": -0.89,
+      "session": "Asia",
+      "hold_seconds": 2230
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR2_BUF0.1-0137",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": -88.8,
+      "pnl_r": -0.89,
+      "session": "Asia",
+      "hold_seconds": 2230
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR3_BUF0.1-0133",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": -88.8,
+      "pnl_r": -0.89,
+      "session": "Asia",
+      "hold_seconds": 2230
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR4_BUF0.1-0131",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": -118.4,
+      "pnl_r": -1.18,
+      "session": "Asia",
+      "hold_seconds": 2230
+    },
+    {
+      "id": "BT-VB_XAUUSD_BUY_RR5_BUF0.1-0131",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": -88.8,
+      "pnl_r": -0.89,
+      "session": "Asia",
+      "hold_seconds": 2230
+    }
+  ],
+  "session_heatmap": [
+    {
+      "session": "Asia",
+      "day": "Fri",
+      "decisions": 16,
+      "avg_pnl": -52.25
+    },
+    {
+      "session": "Asia",
+      "day": "Mon",
+      "decisions": 72,
+      "avg_pnl": -25.43
+    },
+    {
+      "session": "Asia",
+      "day": "Thu",
+      "decisions": 8,
+      "avg_pnl": -237.3
+    },
+    {
+      "session": "Asia",
+      "day": "Tue",
+      "decisions": 67,
+      "avg_pnl": 166.49
+    },
+    {
+      "session": "Asia",
+      "day": "Wed",
+      "decisions": 84,
+      "avg_pnl": -202.76
+    },
+    {
+      "session": "London",
+      "day": "Fri",
+      "decisions": 287,
+      "avg_pnl": -51.94
+    },
+    {
+      "session": "London",
+      "day": "Mon",
+      "decisions": 332,
+      "avg_pnl": 179.15
+    },
+    {
+      "session": "London",
+      "day": "Thu",
+      "decisions": 267,
+      "avg_pnl": 22.89
+    },
+    {
+      "session": "London",
+      "day": "Tue",
+      "decisions": 302,
+      "avg_pnl": -3.39
+    },
+    {
+      "session": "London",
+      "day": "Wed",
+      "decisions": 266,
+      "avg_pnl": 77.01
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+
+== Step 3: L3 - Strategy adjustments generated ==
+
+  Parameter                    |   Old |   New | Reason
+  london_max_lot               |  0.05 |  0.08 | London WR 7/7 — earned more room
+  asian_max_lot                |  0.05 | 0.025 | Asian WR 0/4 — reduce exposure
+  min_confidence_threshold     |  0.40 |  0.55 | Decisions below 0.55 have 0% WR

@@ -1,0 +1,135 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 100;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--cyan);
+  letter-spacing: 2px;
+}
+
+.links {
+  display: flex;
+  gap: 8px;
+}
+
+.link {
+  color: var(--text-dim);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.link:hover {
+  color: var(--text);
+}
+
+.linkActive {
+  color: var(--cyan);
+  border-bottom-color: var(--cyan);
+}
+
+/* Hamburger button — hidden on desktop */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.hamburgerLine {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--cyan);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.hamburgerLine.hamburgerOpen:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburgerLine.hamburgerOpen:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburgerLine.hamburgerOpen:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.langToggle {
+  border: 1px solid var(--cyan);
+  background: transparent;
+  color: var(--text-dim);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.langToggle:hover {
+  color: var(--cyan);
+  background: rgba(0, 229, 255, 0.08);
+}
+
+/* Mobile navigation */
+@media (max-width: 768px) {
+  .nav {
+    padding: 0 16px;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .links {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 60px);
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 24px;
+    background: var(--bg);
+    z-index: 99;
+  }
+
+  .linksOpen {
+    display: flex;
+  }
+
+  .link {
+    padding: 16px 32px;
+    font-size: 1.125rem;
+    border-bottom: none;
+    border-left: 3px solid transparent;
+  }
+
+  .linkActive {
+    border-bottom: none;
+    border-left-color: var(--cyan);
+    background: rgba(0, 229, 255, 0.04);
+  }
+}

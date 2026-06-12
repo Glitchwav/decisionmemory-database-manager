@@ -1,0 +1,7 @@
+* @mnemox-ai
+/.github/ @mnemox-ai
+/src/decisionmemory/auth.py @mnemox-ai
+/src/decisionmemory/db*.py @mnemox-ai
+/src/decisionmemory/audit/ @mnemox-ai
+/database-manager/ @mnemox-ai
+/alembic/ @mnemox-ai

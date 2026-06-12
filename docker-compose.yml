@@ -1,0 +1,23 @@
+# Dev environment: PostgreSQL with TimescaleDB + pgvector
+# Usage: docker-compose up -d
+services:
+  db:
+    image: timescale/timescaledb-ha:pg18
+    container_name: decisionmemory-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=decisionmemory
+      - POSTGRES_PASSWORD=decisionmemory
+      - POSTGRES_DB=decisionmemory
+    volumes:
+      - pgdata:/home/postgres/pgdata/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U decisionmemory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

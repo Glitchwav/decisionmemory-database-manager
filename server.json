@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.mnemox-ai/decisionmemory-protocol",
+  "description": "MCP memory for AI decision-making agents. Store decisions, recall similar setups, track strategy performance.",
+  "repository": {
+    "url": "https://github.com/mnemox-ai/decisionmemory-protocol",
+    "source": "github"
+  },
+  "version": "0.5.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "decisionmemory-protocol",
+      "version": "0.5.0",
+      "transport": { "type": "stdio" },
+      "environmentVariables": []
+    }
+  ]
+}

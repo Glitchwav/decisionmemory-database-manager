@@ -1,0 +1,46 @@
+[
+  {
+    "id": "ADJ-3-001",
+    "timestamp": "2026-03-01T06:15:37.184042+00:00",
+    "adjustment_type": "session_reduce",
+    "parameter": "IntradayMomentum.EURUSD.max_lot",
+    "old_value": "1.0",
+    "new_value": "0.5",
+    "reason": "IntradayMomentum EURUSD worst direction WR 34.4% (n=1184) — reduce max lot by 50% to limit exposure",
+    "status": "proposed",
+    "strategy": "IntradayMomentum"
+  },
+  {
+    "id": "ADJ-2-001",
+    "timestamp": "2026-03-01T06:15:37.184042+00:00",
+    "adjustment_type": "strategy_prefer",
+    "parameter": "IntradayMomentum.priority",
+    "old_value": "normal",
+    "new_value": "high",
+    "reason": "IntradayMomentum avg PnL +1690.9% — profitable with WR 40.1%, prefer this strategy",
+    "status": "proposed",
+    "strategy": "IntradayMomentum"
+  },
+  {
+    "id": "ADJ-2-002",
+    "timestamp": "2026-03-01T06:15:37.184042+00:00",
+    "adjustment_type": "strategy_prefer",
+    "parameter": "VolBreakout.priority",
+    "old_value": "normal",
+    "new_value": "high",
+    "reason": "VolBreakout avg PnL +467.0% — profitable with WR 45.3%, prefer this strategy",
+    "status": "proposed",
+    "strategy": "VolBreakout"
+  },
+  {
+    "id": "ADJ-2-003",
+    "timestamp": "2026-03-01T06:15:37.184042+00:00",
+    "adjustment_type": "strategy_prefer",
+    "parameter": "PullbackEntry.priority",
+    "old_value": "normal",
+    "new_value": "high",
+    "reason": "PullbackEntry avg PnL +368.3% — profitable with WR 48.0%, prefer this strategy",
+    "status": "proposed",
+    "strategy": "Pullback"
+  }
+]

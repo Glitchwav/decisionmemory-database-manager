@@ -1,0 +1,53 @@
+# DecisionMemory Protocol
+
+> Platform-agnostic AI decision-making memory system with Outcome-Weighted Memory (OWM) architecture via MCP. Accepts standardized decision data from any source (MT5, Binance, Alpaca) and provides structured memory with LLM-powered reflection.
+
+DecisionMemory Protocol is an open-source memory layer for AI-assisted decision-making systems. It does NOT connect to decision-making platforms directly — it accepts standardized decision data and organizes it into three layers:
+
+- L1 (Raw Decisions): Every decision recorded automatically with full metadata
+- L2 (Patterns): AI discovers what works and what doesn't across decision history
+- L3 (Strategy): Memory becomes judgment — adaptive risk and strategy refinement
+
+Key capabilities:
+- 4 MCP tools: store_decision, recall_decisions, get_performance, run_reflection
+- LLM-powered reflection engine (Claude API) for decision analysis
+- Adaptive risk management based on historical memory
+- Platform-agnostic: works with MT5, Binance, Alpaca, or any decision-making platform
+- MT5 auto-sync via mt5_sync.py (polls every 60 seconds)
+
+## Install
+
+### Claude Desktop
+Add to claude_desktop_config.json:
+{
+  "mcpServers": {
+    "decisionmemory": {
+      "command": "uvx",
+      "args": ["decisionmemory-protocol"]
+    }
+  }
+}
+
+### Claude Code
+claude mcp add decisionmemory -- uvx decisionmemory-protocol
+
+### pip
+pip install decisionmemory-protocol
+
+## Documentation
+
+- [README](https://github.com/mnemox-ai/decisionmemory-protocol#readme): Full documentation with architecture diagrams.
+- [PyPI](https://pypi.org/project/decisionmemory-protocol/): Install via `pip install decisionmemory-protocol`.
+- [Quick Start](https://github.com/mnemox-ai/decisionmemory-protocol#quick-start): Multiple installation methods (Claude Desktop, Claude Code, source, Docker).
+
+## MCP Tools
+
+- store_decision: Record a decision with standardized schema (symbol, direction, lots, entry/exit price, outcome)
+- recall_decisions: Query decision history with filters (symbol, date range, strategy)
+- get_performance: Calculate performance metrics (win rate, profit factor, drawdown)
+- run_reflection: Trigger LLM-powered analysis of recent decisions
+
+## Optional
+
+- [MT5 Setup Guide](https://github.com/mnemox-ai/decisionmemory-protocol#connect-to-mt5): How to connect MetaDecision-Maker 5 for automatic decision syncing.
+- [Dashboard](https://github.com/mnemox-ai/decisionmemory-protocol#dashboard): Streamlit-based monitoring dashboard.

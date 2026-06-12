@@ -1,0 +1,8 @@
+{
+  "name": "decisionmemory",
+  "version": "0.5.0",
+  "description": "Persistent memory + autonomous strategy evolution for AI decision-makers. 200+ decision-making MCP servers execute. None remember. DecisionMemory does.",
+  "author": {
+    "name": "Mnemox AI"
+  }
+}

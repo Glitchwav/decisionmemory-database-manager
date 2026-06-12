@@ -1,0 +1,227 @@
+{
+  "_disclaimer": "⚠️ Generated from backtest data (2024.01-2026.02, n=10,169). Not live decision_making results.",
+  "name": "IntradayMomentum",
+  "total_decisions": 2101,
+  "win_rate": 0.418,
+  "profit_factor": 1.96,
+  "avg_pnl_r": 0.86,
+  "avg_hold_seconds": 5143,
+  "best_session": "London",
+  "worst_session": "London",
+  "baseline_pf": 1.78,
+  "baseline_wr": 0.58,
+  "decisions": [
+    {
+      "id": "BT-IM_EURUSD_BUY_RR1.5_TH0.55-0067",
+      "date": "2026-02-23",
+      "side": "BUY",
+      "pnl": -21.36,
+      "pnl_r": -0.21,
+      "session": "London",
+      "hold_seconds": 207
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR1.5_TH0.65-0056",
+      "date": "2026-02-23",
+      "side": "BUY",
+      "pnl": -24.92,
+      "pnl_r": -0.25,
+      "session": "London",
+      "hold_seconds": 207
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR2.5_TH0.45-0064",
+      "date": "2026-02-23",
+      "side": "BUY",
+      "pnl": -24.92,
+      "pnl_r": -0.25,
+      "session": "London",
+      "hold_seconds": 207
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR2.5_TH0.55-0061",
+      "date": "2026-02-23",
+      "side": "BUY",
+      "pnl": -24.92,
+      "pnl_r": -0.25,
+      "session": "London",
+      "hold_seconds": 207
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR2.5_TH0.65-0051",
+      "date": "2026-02-23",
+      "side": "BUY",
+      "pnl": -24.92,
+      "pnl_r": -0.25,
+      "session": "London",
+      "hold_seconds": 207
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR3.5_TH0.45-0044",
+      "date": "2026-02-23",
+      "side": "BUY",
+      "pnl": -24.92,
+      "pnl_r": -0.25,
+      "session": "London",
+      "hold_seconds": 207
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR3.5_TH0.55-0042",
+      "date": "2026-02-23",
+      "side": "BUY",
+      "pnl": -24.92,
+      "pnl_r": -0.25,
+      "session": "London",
+      "hold_seconds": 207
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR3.5_TH0.65-0035",
+      "date": "2026-02-23",
+      "side": "BUY",
+      "pnl": -24.92,
+      "pnl_r": -0.25,
+      "session": "London",
+      "hold_seconds": 207
+    },
+    {
+      "id": "BT-IM_EURUSD_BOTH_RR1.5_TH0.45-0113",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BOTH_RR1.5_TH0.55-0104",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BOTH_RR2.5_TH0.45-0089",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BOTH_RR2.5_TH0.55-0085",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BOTH_RR3.5_TH0.45-0055",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BOTH_RR3.5_TH0.55-0053",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR1.5_TH0.45-0072",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR1.5_TH0.55-0068",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR2.5_TH0.45-0065",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR2.5_TH0.55-0062",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR3.5_TH0.45-0045",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    },
+    {
+      "id": "BT-IM_EURUSD_BUY_RR3.5_TH0.55-0043",
+      "date": "2026-02-25",
+      "side": "BUY",
+      "pnl": 0.32,
+      "pnl_r": 0.0,
+      "session": "London",
+      "hold_seconds": 2274
+    }
+  ],
+  "session_heatmap": [
+    {
+      "session": "London",
+      "day": "Fri",
+      "decisions": 374,
+      "avg_pnl": 47.82
+    },
+    {
+      "session": "London",
+      "day": "Mon",
+      "decisions": 609,
+      "avg_pnl": 179.15
+    },
+    {
+      "session": "London",
+      "day": "Thu",
+      "decisions": 461,
+      "avg_pnl": 64.33
+    },
+    {
+      "session": "London",
+      "day": "Tue",
+      "decisions": 302,
+      "avg_pnl": 30.1
+    },
+    {
+      "session": "London",
+      "day": "Wed",
+      "decisions": 355,
+      "avg_pnl": 40.2
+    }
+  ]
+}
