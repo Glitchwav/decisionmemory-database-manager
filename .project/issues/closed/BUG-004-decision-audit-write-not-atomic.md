@@ -2,7 +2,8 @@
 
 > **Category:** BUG
 > **Severity:** High
-> **Status:** open
+> **Status:** resolved
+> **Resolved:** 2026-06-12
 > **Filed:** 2026-06-12
 > **Affected:** `src/decisionmemory/db_surreal.py:495`, `src/decisionmemory/db_surreal.py:505`, `src/decisionmemory/db_surreal.py:507`, `src/decisionmemory/db_surreal.py:332`
 
@@ -25,6 +26,9 @@ SQLite transaction assumptions were carried into an HTTP-backed compatibility wr
 - Ensure duplicate IDs with changed immutable content are treated as tampering, not successful idempotency.
 - Add fault-injection tests for failure between the two writes.
 
-## Decision
+## Resolution
 
-Pending.
+The compatibility backend now verifies immutable content on duplicate IDs,
+repairs missing audit entries deterministically, detects audit tampering, and
+removes a newly created decision when audit creation cannot be verified.
+Fault-injection tests cover repair, ambiguous commits, and rollback behavior.

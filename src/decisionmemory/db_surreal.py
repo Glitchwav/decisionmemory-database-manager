@@ -98,85 +98,79 @@ class SurrealConnection:
         self._db = surreal_db
         self.row_factory = None  # Ignored, we always return SurrealRow
 
-    def _parse_condition(self, cond_str: str, params: tuple) -> str:
+    @staticmethod
+    def _bind(bindings: dict[str, Any], value: Any) -> str:
+        name = f"p{len(bindings)}"
+        bindings[name] = value
+        return f"${name}"
+
+    def _parse_condition(
+        self, cond_str: str, params: tuple, bindings: dict[str, Any]
+    ) -> str:
         """Convert a SQL WHERE condition to SurreQL."""
         cond = cond_str.strip()
 
         # col >= ? or col <= ? or col < ? or col > ?
-        m = re.match(r'(\w+)\s*(>=|<=|<|>)\s*\?', cond)
+        m = re.fullmatch(r'(\w+)\s*(>=|<=|<|>)\s*\?', cond)
         if m:
             col, op = m.group(1), m.group(2)
-            val = params[0]
-            return f"{col} {op} '{val}'" if isinstance(val, str) else f"{col} {op} {val}"
+            return f"{col} {op} {self._bind(bindings, params[0])}"
 
         # col = ?
-        m = re.match(r'(\w+)\s*=\s*\?', cond)
+        m = re.fullmatch(r'(\w+)\s*=\s*\?', cond)
         if m:
             col = m.group(1)
-            val = params[0]
-            if val is None:
-                return f"{col} = NONE"
-            return f"{col} = '{val}'" if isinstance(val, str) else f"{col} = {val}"
+            return f"{col} = {self._bind(bindings, params[0])}"
 
-        # Fallback: return as-is
-        return cond
+        raise ValueError(f"Unsupported compatibility WHERE condition: {cond!r}")
 
-    def _translate_sql(self, sql: str, params: tuple) -> str:
+    def _translate_sql(self, sql: str, params: tuple) -> tuple[str, dict[str, Any]]:
         """Translate a SQL query to SurreQL. Handles ChainBuilder's patterns."""
         sql = sql.strip()
+        bindings: dict[str, Any] = {}
 
         # INSERT OR REPLACE INTO table (cols) VALUES (?, ?, ...)
-        m = re.match(
+        m = re.fullmatch(
             r'INSERT\s+OR\s+REPLACE\s+INTO\s+(\w+)\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)',
             sql, re.IGNORECASE
         )
         if m:
             table = m.group(1)
             cols = [c.strip() for c in m.group(2).split(',')]
-            placeholders = m.group(3)
-            n = len(re.findall(r'\?', placeholders))
+            placeholders = [p.strip() for p in m.group(3).split(',')]
+            if placeholders != ['?'] * len(cols) or len(params) != len(cols):
+                raise ValueError("INSERT columns, placeholders, and params must match")
             sets = []
             for i, col in enumerate(cols):
                 val = params[i] if i < len(params) else None
-                if val is None:
-                    sets.append(f"{col} = NONE")
-                elif isinstance(val, (list, dict)):
-                    sets.append(f"{col} = {json.dumps(val)}")
-                elif isinstance(val, str):
-                    escaped = val.replace("'", "\\'")
-                    sets.append(f"{col} = '{escaped}'")
-                else:
-                    sets.append(f"{col} = {val}")
-            return f"UPSERT tm_{table} SET {', '.join(sets)}"
+                sets.append(f"{col} = {self._bind(bindings, val)}")
+            return f"UPSERT tm_{table} SET {', '.join(sets)}", bindings
 
         # INSERT INTO table (cols) VALUES (?, ?, ...)
-        m = re.match(
+        m = re.fullmatch(
             r'INSERT\s+INTO\s+(\w+)\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)',
             sql, re.IGNORECASE
         )
         if m:
             table = m.group(1)
             cols = [c.strip() for c in m.group(2).split(',')]
-            placeholders = m.group(3)
-            n = len(re.findall(r'\?', placeholders))
+            placeholders = [p.strip() for p in m.group(3).split(',')]
+            if placeholders != ['?'] * len(cols) or len(params) != len(cols):
+                raise ValueError("INSERT columns, placeholders, and params must match")
             sets = []
             for i, col in enumerate(cols):
                 val = params[i] if i < len(params) else None
-                if val is None:
-                    sets.append(f"{col} = NONE")
-                elif isinstance(val, (list, dict)):
-                    sets.append(f"{col} = {json.dumps(val)}")
-                elif isinstance(val, str):
-                    escaped = val.replace("'", "\\'")
-                    sets.append(f"{col} = '{escaped}'")
-                else:
-                    sets.append(f"{col} = {val}")
-            return f"CREATE tm_{table} SET {', '.join(sets)}"
+                sets.append(f"{col} = {self._bind(bindings, val)}")
+            return f"CREATE tm_{table} SET {', '.join(sets)}", bindings
 
         # SELECT ... FROM table [WHERE ...] [ORDER BY ...] [LIMIT N]
         m = re.match(r'SELECT\s+(.+?)\s+FROM\s+(\w+)(.*)', sql, re.IGNORECASE)
         if m:
             select_cols = m.group(1).strip()
+            if select_cols != '*' and not re.fullmatch(
+                r'\w+(?:\s*,\s*\w+)*', select_cols
+            ):
+                raise ValueError("Unsupported SELECT projection")
             table = m.group(2)
             rest = m.group(3).strip()
 
@@ -187,6 +181,12 @@ class SurrealConnection:
             # Extract ORDER BY
             order_match = re.search(r'ORDER\s+BY\s+(.+?)(?:LIMIT|$)', rest, re.IGNORECASE)
             order_clause = order_match.group(1).strip() if order_match else None
+            if order_clause and not re.fullmatch(
+                r'\w+(?:\s+(?:ASC|DESC))?(?:\s*,\s*\w+(?:\s+(?:ASC|DESC))?)*',
+                order_clause,
+                re.IGNORECASE,
+            ):
+                raise ValueError("Unsupported ORDER BY clause")
 
             # Extract LIMIT
             limit_match = re.search(r'LIMIT\s+(\d+)', rest, re.IGNORECASE)
@@ -203,8 +203,14 @@ class SurrealConnection:
                     if n_qmarks > 0:
                         cond_params = tuple(params[param_idx:param_idx + n_qmarks])
                         param_idx += n_qmarks
-                        surreal_conds.append(self._parse_condition(cond, cond_params))
+                        surreal_conds.append(
+                            self._parse_condition(cond, cond_params, bindings)
+                        )
                     else:
+                        if not re.fullmatch(r'\w+\s*=\s*(?:NONE|true|false|\d+)', cond):
+                            raise ValueError(
+                                f"Unsupported literal WHERE condition: {cond!r}"
+                            )
                         surreal_conds.append(cond)
 
             # Build SurreQL — always SELECT * because SurrealDB requires
@@ -219,13 +225,13 @@ class SurrealConnection:
             if limit_val:
                 q += f" LIMIT {limit_val}"
 
-            return q
+            return q, bindings
 
         # DELETE FROM table
-        m = re.match(r'DELETE\s+FROM\s+(\w+)', sql, re.IGNORECASE)
+        m = re.fullmatch(r'DELETE\s+FROM\s+(\w+)', sql, re.IGNORECASE)
         if m:
             table = m.group(1)
-            return f"DELETE FROM tm_{table}"
+            return f"DELETE FROM tm_{table}", bindings
 
         # UPDATE table SET ... WHERE ...
         m = re.match(r'UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(.+))?$', sql, re.IGNORECASE)
@@ -248,15 +254,9 @@ class SurrealConnection:
                         col = m2.group(1)
                         val = params[param_idx]
                         param_idx += 1
-                        if val is None:
-                            set_assigns.append(f"{col} = NONE")
-                        elif isinstance(val, (list, dict)):
-                            set_assigns.append(f"{col} = {json.dumps(val)}")
-                        elif isinstance(val, str):
-                            escaped = val.replace("'", "\\'")
-                            set_assigns.append(f"{col} = '{escaped}'")
-                        else:
-                            set_assigns.append(f"{col} = {val}")
+                        set_assigns.append(
+                            f"{col} = {self._bind(bindings, val)}"
+                        )
                 else:
                     # "col = col + ?" or "col = value"
                     m2 = re.match(r'(\w+)\s*=\s*(.+)', assign)
@@ -266,7 +266,17 @@ class SurrealConnection:
                         if '?' in expr:
                             val = params[param_idx]
                             param_idx += 1
-                            expr = expr.replace('?', f"'{val}'" if isinstance(val, str) else str(val))
+                            if expr.count('?') != 1 or not re.fullmatch(
+                                r'\w+\s*[+-]\s*\?', expr
+                            ):
+                                raise ValueError(
+                                    f"Unsupported compatibility SET expression: {expr!r}"
+                                )
+                            expr = expr.replace('?', self._bind(bindings, val))
+                        elif not re.fullmatch(r'\w+', expr):
+                            raise ValueError(
+                                f"Unsupported literal SET expression: {expr!r}"
+                            )
                         set_assigns.append(f"{col} = {expr}")
 
             # Parse WHERE
@@ -275,30 +285,30 @@ class SurrealConnection:
                 n_qmarks = where_part.count('?')
                 cond_params = tuple(params[param_idx:param_idx + n_qmarks])
                 param_idx += n_qmarks
-                where_surreal = " WHERE " + self._parse_condition(where_part, cond_params)
+                where_surreal = " WHERE " + self._parse_condition(
+                    where_part, cond_params, bindings
+                )
 
-            return f"UPDATE tm_{table} SET {', '.join(set_assigns)}{where_surreal}"
+            return (
+                f"UPDATE tm_{table} SET {', '.join(set_assigns)}{where_surreal}",
+                bindings,
+            )
 
-        # Fallback — try to prefix table names
-        return sql
+        raise ValueError("Unsupported SQL for Surreal compatibility backend")
 
     def execute(self, sql: str, params=()) -> SurrealCursor:
         """Execute SQL translated to SurreQL, return SurrealCursor."""
         if isinstance(params, dict):
-            # Named params — convert to positional for ChainBuilder compat
-            # Actually, named params are used by Database methods, not ChainBuilder
-            # We handle them differently in the SurrealDatabase methods directly
-            # This path shouldn't be hit for ChainBuilder
-            pass
+            raise ValueError("Named SQL params are unsupported by compatibility layer")
 
         if not isinstance(params, (tuple, list)):
             params = tuple(params) if params else ()
 
-        surrealql = self._translate_sql(sql, tuple(params))
+        surrealql, bindings = self._translate_sql(sql, tuple(params))
         logger.debug("SurrealQL: %s", surrealql)
 
         try:
-            result = self._db.query(surrealql)
+            result = self._db.query(surrealql, bindings)
             if not isinstance(result, list):
                 result = result if result else []
 
@@ -486,6 +496,32 @@ class SurrealDatabase:
         )
         return len(result) > 0
 
+    @staticmethod
+    def _decision_content_hash(
+        decision: Dict[str, Any],
+        decision_id: str | None = None,
+    ) -> str:
+        from .domain.tdr import DecisionMakingDecisionRecord
+
+        market_context = decision.get('market_context', {})
+        if isinstance(market_context, str):
+            try:
+                market_context = json.loads(market_context)
+            except json.JSONDecodeError as exc:
+                raise DecisionMemoryDBError(
+                    "Stored decision has invalid market_context JSON"
+                ) from exc
+        return DecisionMakingDecisionRecord.compute_hash(
+            decision_id=decision_id if decision_id is not None else decision.get('id', ''),
+            timestamp=decision.get('timestamp', ''),
+            symbol=decision.get('symbol', ''),
+            direction=decision.get('direction', '') or '',
+            strategy=decision.get('strategy', ''),
+            confidence=decision.get('confidence', 0.0),
+            reasoning=decision.get('reasoning', ''),
+            market_context=market_context,
+        )
+
     # ==================================================================
     # Decision Records
     # ==================================================================
@@ -493,8 +529,6 @@ class SurrealDatabase:
     def insert_decision(self, decision_data: Dict[str, Any]) -> bool:
         """Insert a decision record with audit chain."""
         from .audit.chain import ChainBuilder
-        from .domain.tdr import DecisionMakingDecisionRecord
-
         try:
             # Convert datetime objects to ISO strings
             if isinstance(decision_data.get('timestamp'), datetime):
@@ -504,16 +538,7 @@ class SurrealDatabase:
 
             # Compute content_hash from original market context
             raw_market_ctx = decision_data.get('market_context', {})
-            content_hash = DecisionMakingDecisionRecord.compute_hash(
-                decision_id=decision_data.get('id', ''),
-                timestamp=decision_data.get('timestamp', ''),
-                symbol=decision_data.get('symbol', ''),
-                direction=decision_data.get('direction', '') or '',
-                strategy=decision_data.get('strategy', ''),
-                confidence=decision_data.get('confidence', 0.0),
-                reasoning=decision_data.get('reasoning', ''),
-                market_context=raw_market_ctx,
-            )
+            content_hash = self._decision_content_hash(decision_data)
 
             # Serialize JSON fields for storage
             stored_data = dict(decision_data)
@@ -529,28 +554,32 @@ class SurrealDatabase:
 
             # Check if already exists
             existing = self._q(
-                'SELECT id FROM type::thing($tbl, $rid)',
+                'SELECT * FROM type::thing($tbl, $rid)',
                 {'tbl': 'tm_decision_records', 'rid': decision_id},
             )
             if existing:
-                # BUG-004 fix: verify audit chain entry exists, repair if missing
-                try:
-                    with self.get_connection() as conn:
-                        entry = ChainBuilder(conn).get_entry(decision_id)
-                        if entry is None:
-                            logger.warning(
-                                "Decision %s exists but audit entry missing — repairing",
-                                decision_id,
-                            )
-                            ChainBuilder(conn).append(
-                                record_id=decision_id,
-                                content_hash=content_hash,
-                            )
-                except Exception as repair_err:
-                    logger.error(
-                        "Audit repair failed for %s: %s",
-                        decision_id, repair_err,
+                # SurrealDB returns a qualified RecordID (table:id). Hash the
+                # canonical caller ID so an identical retry remains idempotent.
+                stored_hash = self._decision_content_hash(existing[0], decision_id)
+                if stored_hash != content_hash:
+                    raise DecisionMemoryDBError(
+                        f"Decision {decision_id!r} already exists with different "
+                        "immutable content; refusing overwrite"
                     )
+                with self.get_connection() as conn:
+                    builder = ChainBuilder(conn)
+                    entry = builder.get_entry(decision_id)
+                    if entry is None:
+                        logger.warning(
+                            "Decision %s exists but audit entry missing; repairing",
+                            decision_id,
+                        )
+                        builder.append(decision_id, stored_hash)
+                    elif entry.content_hash != stored_hash:
+                        raise DecisionMemoryDBError(
+                            f"Decision {decision_id!r} audit hash does not match "
+                            "stored immutable content"
+                        )
                 return True
 
             # Insert the decision
@@ -560,16 +589,36 @@ class SurrealDatabase:
             # Append to audit chain
             try:
                 with self.get_connection() as conn:
-                    ChainBuilder(conn).append(
+                    builder = ChainBuilder(conn)
+                    builder.append(
                         record_id=decision_id,
                         content_hash=content_hash,
                     )
             except Exception as chain_err:
-                logger.error(
-                    "audit chain append failed for %s: %s",
-                    decision_id, chain_err,
+                entry = None
+                try:
+                    with self.get_connection() as conn:
+                        entry = ChainBuilder(conn).get_entry(decision_id)
+                except Exception:
+                    logger.exception("Could not verify failed audit append")
+                if entry is None or entry.content_hash != content_hash:
+                    try:
+                        self._q(
+                            'DELETE type::thing($tbl, $rid)',
+                            {'tbl': 'tm_decision_records', 'rid': decision_id},
+                        )
+                    except Exception:
+                        logger.exception(
+                            "Failed to remove unchained decision %s", decision_id
+                        )
+                    raise DecisionMemoryDBError(
+                        f"Audit append failed for decision {decision_id!r}; "
+                        "decision creation was rolled back"
+                    ) from chain_err
+                logger.warning(
+                    "Audit append for %s raised after commit; verified persisted entry",
+                    decision_id,
                 )
-                raise
 
             return True
         except DecisionMemoryDBError:

@@ -2,7 +2,8 @@
 
 > **Category:** SEC
 > **Severity:** High
-> **Status:** open
+> **Status:** resolved
+> **Resolved:** 2026-06-12
 > **Filed:** 2026-06-12
 > **Affected:** `src/decisionmemory/db_surreal.py:101`, `src/decisionmemory/db_surreal.py:376`, `src/decisionmemory/db_surreal.py:442`, `src/decisionmemory/db_surreal.py:497`, `src/decisionmemory/db_surreal.py:573`, `src/decisionmemory/db_surreal.py:785`
 
@@ -25,6 +26,9 @@ The backend uses ad hoc string construction instead of SurrealDB's structured re
 - Reject unsupported identifiers before executing queries.
 - Add adversarial tests covering quotes, backslashes, hyphens, periods, colons, whitespace, Unicode, and injection-shaped input.
 
-## Decision
+## Resolution
 
-Pending.
+The compatibility translator now binds all values as SurrealDB query
+parameters, rejects unsupported or trailing SQL, and validates projections,
+ordering, assignments, and conditions. Adversarial compatibility tests cover
+injection-shaped values and unsupported syntax.

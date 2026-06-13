@@ -1,6 +1,6 @@
 ---
 name: decision-memory
-description: Domain knowledge for AI decision memory — Outcome-Weighted Memory (OWM) architecture, 5 memory types, recall scoring, and behavioral analysis. Use when recording decisions, recalling similar contexts, analyzing performance, or checking behavioral drift. Triggers on "record decision", "remember decision", "recall", "similar decisions", "performance", "behavioral", "disposition", "affective state", "confidence".
+description: Use DecisionMemory Protocol v0.5.2 for persistent decision memory, outcome-weighted recall, behavioral and affective analysis, prospective plans, audit verification, strategy validation, and evolution. Trigger when the user asks to record or remember a completed decision; recall similar decisions or contexts; inspect strategy performance, reflection, behavioral drift, disposition, confidence, drawdown, or agent state; create or check a decision plan; compute decision quality or legitimacy; validate or evolve a strategy; or export or verify an audit trail.
 ---
 
 # Decision Memory
@@ -11,15 +11,13 @@ DecisionMemory implements a cognitive memory architecture for decision agents. E
 
 This is not a decision journal. It's a memory system that learns which past experiences are most relevant to current decisions.
 
-## Architecture: 3-Layer Pipeline
+## Architecture
 
 ```
-L1: Raw Decisions → L2: Pattern Discovery → L3: Strategy Adjustments
+Episodic → Semantic → Procedural
+              ↘ Affective
+Prospective plans are created and checked separately.
 ```
-
-- **L1 (Episodic)**: Every decision stored as-is with full context. The ground truth.
-- **L2 (Patterns)**: Behavioral patterns discovered from L1 data. Disposition effect, session biases, strategy correlations.
-- **L3 (Adjustments)**: Concrete strategy adjustments derived from L2 patterns. Parameter changes, rule modifications, strategy retirement.
 
 ## Outcome-Weighted Memory (OWM) — 5 Memory Types
 
@@ -32,19 +30,19 @@ Raw decision events. Each record contains: symbol, direction, entry/exit, P&L, s
 ### 2. Semantic Memory
 Strategy knowledge base. Aggregated understanding of what works: "VolBreakout performs best in London session with ATR > $40" is semantic memory.
 
-**When to write**: Automatically updated when decisions are stored via `remember_decision`.
+**When to write**: Automatically updated by `remember_decision`.
 **When to read**: When evaluating whether a strategy fits current conditions.
 
 ### 3. Procedural Memory
 Behavioral baselines. Tracks execution patterns: average hold times per strategy, lot sizing consistency, stop outcome setback adherence, entry timing precision.
 
-**When to write**: Automatically computed from decision history.
+**When to write**: Automatically updated by `remember_decision`.
 **When to read**: During behavioral analysis and daily reviews.
 
 ### 4. Affective Memory
 Emotional/confidence state. Tracks: current confidence level (0-1), drawdown percentage, win/outcome setback streaks, risk appetite, tilt indicators.
 
-**When to write**: Updated after every decision and during daily reviews.
+**When to write**: Automatically updated by `remember_decision`.
 **When to read**: Before entering decisions (am I on tilt?), during risk checks.
 
 ### 5. Prospective Memory
@@ -55,36 +53,55 @@ Active decision-making plans. Future-oriented: "If XAUUSD breaks above 5200 with
 
 ## OWM Recall Scoring
 
-When you query `recall_memories`, results are scored by:
+Pure OWM recall uses a multiplicative five-factor score:
 
-| Factor | Weight | Description |
-|--------|--------|-------------|
-| P&L Outcome | 40% | successful decisions score higher. Magnitude matters. |
-| Context Similarity | 30% | How closely the recalled context matches the query context |
-| Recency | 20% | Recent decisions weighted more (exponential decay) |
-| Confidence Calibration | 10% | Decisions where confidence matched outcome score higher |
+```
+score = Q × Sim × Rec × Conf × Aff
+```
 
-**Why outcome-weighted?** Traditional decision journals treat all decisions equally. OWM amplifies signal from successful decisions in similar contexts. If you've succeeded 5 times decision-making London session breakouts, those memories surface strongly when you're evaluating the next London session breakout.
+| Factor | Implementation |
+|--------|----------------|
+| `Q` outcome quality | `sigmoid(2 × pnl_r / 1.5)`; falls back to memory confidence when `pnl_r` is absent |
+| `Sim` context similarity | Similarity between stored and query `ContextVector` values |
+| `Rec` recency | Power law `(1 + age_days / tau)^(-d)`; episodic uses `tau=30, d=0.5`, semantic uses `tau=180, d=0.3` |
+| `Conf` confidence | `0.5 + 0.5 × clamp(confidence, 0, 1)` |
+| `Aff` affective modulation | Current drawdown/loss-streak modulation, clamped to `[0.7, 1.3]` |
+
+By default, `recall_memories` requests hybrid recall with `hybrid_alpha=0.3`. When embeddings are available, the final hybrid score blends vector similarity and OWM; otherwise it falls back to the pure multiplicative OWM score.
 
 ## MCP Tools Reference
 
-### Core Memory (2 tools)
+DecisionMemory Protocol v0.5.2 registers **20 MCP tools**.
 
-| Tool | Use Case |
-|------|----------|
-| `get_strategy_performance` | Aggregate stats: win rate, PF, P&L per strategy |
-| `get_decision_reflection` | Deep-dive into a specific decision's reasoning |
+### Memory and State
 
-### OWM Cognitive Memory (6 tools)
+| Tool | Signature |
+|------|-----------|
+| `get_strategy_performance` | `(strategy_name=None, symbol=None)` |
+| `get_decision_reflection` | `(decision_id)` |
+| `remember_decision` | `(symbol, direction, entry_price, exit_price, pnl, strategy_name, market_context, pnl_r=None, context_regime=None, context_atr_d1=None, confidence=0.5, reflection=None, max_adverse_excursion=None, decision_id=None, timestamp=None, entry_timestamp=None, exit_timestamp=None)` |
+| `recall_memories` | `(symbol, market_context, context_regime=None, context_atr_d1=None, strategy_name=None, memory_types=None, limit=10, use_hybrid=True, hybrid_alpha=0.3)` |
+| `get_behavioral_analysis` | `(strategy_name=None, symbol=None)` |
+| `get_agent_state` | `()` |
+| `create_decision_making_plan` | `(trigger_type, trigger_condition, planned_action, reasoning, expiry_days=30, priority=0.5)` |
+| `check_active_plans` | `(context_regime=None, context_atr_d1=None)` |
 
-| Tool | Use Case |
-|------|----------|
-| `remember_decision` | Full OWM store: writes to all 5 memory layers |
-| `recall_memories` | OWM recall: scored by outcome, similarity, recency, calibration |
-| `get_behavioral_analysis` | Procedural memory: disposition ratio, hold times, Kelly criterion |
-| `get_agent_state` | Affective state: confidence, drawdown, streaks, risk appetite |
-| `create_decision_plan` | Prospective memory: entry/exit conditions, risk parameters |
-| `check_active_plans` | Evaluate active plans against current decision context conditions |
+### Evolution, Audit, and Validation
+
+| Tool | Signature |
+|------|-----------|
+| `evolution_fetch_market_data` | `(symbol, timeframe="1h", days=90)` |
+| `evolution_discover_patterns` | `(symbol, timeframe="1h", count=5, temperature=0.7, days=90)` |
+| `evolution_run_backtest` | `(pattern_dict, symbol="BTCUSDT", timeframe="1h", days=90)` |
+| `evolution_evolve_strategy` | `(symbol, timeframe="1h", generations=3, population_size=10, days=90)` |
+| `evolution_get_log` | `()` |
+| `export_audit_trail` | `(decision_id=None, strategy=None, start=None, end=None, limit=50)` |
+| `verify_audit_hash` | `(decision_id)` |
+| `verify_audit_chain` | `(from_seq=None, to_seq=None)` |
+| `get_daily_root` | `(date, rebuild=False, request_tsa=False, include_token=False)` |
+| `validate_strategy` | `(file_path, format="quantconnect", strategy_name="", num_strategies=1)` |
+| `check_decision_legitimacy` | `(strategy_name, symbol="XAUUSD", current_regime=None, current_atr_d1=None)` |
+| `compute_dqs` | `(symbol, strategy_name, direction, proposed_lot_size=0.1, market_context="", context_regime=None, context_atr_d1=None)` |
 
 ## Best Practices
 
@@ -120,12 +137,16 @@ When you query `recall_memories`, results are scored by:
 Decision Closes
     ↓
 remember_decision() → Episodic (raw event)
-                  → Semantic (strategy knowledge update)
-                  → Procedural (behavioral baseline update)
-                  → Affective (confidence/streak update)
-                  → Prospective (check active plans)
+                  → Semantic (Bayesian strategy knowledge)
+                  → Procedural (running behavior statistics)
+                  → Affective (EWMA confidence/streak state)
+                  → decision_records (backward compatibility)
     ↓
 recall_memories() ← OWM scoring
     ↓
 Next Decision
 ```
+
+`remember_decision` does **not** write prospective memory. Use
+`create_decision_making_plan` to create prospective plans and
+`check_active_plans` to evaluate them.

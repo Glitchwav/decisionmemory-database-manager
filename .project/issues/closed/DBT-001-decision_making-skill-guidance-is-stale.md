@@ -2,7 +2,8 @@
 
 > **Category:** DBT
 > **Severity:** Medium
-> **Status:** open
+> **Status:** resolved
+> **Resolved:** 2026-06-12
 > **Filed:** 2026-06-12
 > **Affected:** `.skills/decisionmemory/SKILL.md:4`, `.skills/decisionmemory/SKILL.md:5`, `.skills/decisionmemory/SKILL.md:7`, `.skills/decisionmemory/SKILL.md:95`, `decisionmemory-plugin/skills/decision_making-memory/SKILL.md:3`, `decisionmemory-plugin/skills/decision_making-memory/SKILL.md:56`, `decisionmemory-plugin/skills/decision_making-memory/SKILL.md:82`
 
@@ -33,6 +34,10 @@ Skill documentation evolved independently from implementation and contains stati
 - Move installation and long reference material behind progressive-disclosure references.
 - Add a release check that compares skill claims with registered tools and package metadata.
 
-## Decision
+## Resolution
 
-Pending.
+The packaged skill now matches package version 0.5.2, documents all 20
+registered tools and their signatures, describes the implemented
+multiplicative five-factor scoring model, and distinguishes prospective plans
+from the layers written by `remember_decision`. Contract tests prevent these
+claims from drifting from implementation metadata.

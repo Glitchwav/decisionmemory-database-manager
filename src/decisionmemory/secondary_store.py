@@ -23,6 +23,16 @@ class SecondaryStore(Protocol):
     def publish_session_state(self, state: Mapping[str, Any]) -> None:
         """Publish the latest agent session state."""
 
+    def publish_episodic(self, memory: Mapping[str, Any]) -> None:
+        """Publish an episodic memory record."""
+
+    def publish_episodic_embedding(
+        self,
+        memory_id: str,
+        embedding: list[float],
+    ) -> None:
+        """Patch a published episodic memory with its embedding."""
+
 
 class DisabledSecondaryStore:
     """Default secondary store; intentionally performs no work."""
@@ -35,6 +45,16 @@ class DisabledSecondaryStore:
 
     def publish_session_state(self, state: Mapping[str, Any]) -> None:
         del state
+
+    def publish_episodic(self, memory: Mapping[str, Any]) -> None:
+        del memory
+
+    def publish_episodic_embedding(
+        self,
+        memory_id: str,
+        embedding: list[float],
+    ) -> None:
+        del memory_id, embedding
 
 
 class SurrealGraphPublisher:
@@ -119,6 +139,28 @@ class SurrealGraphPublisher:
             {"agent_id": str(state["agent_id"]), "state": dict(state)},
         )
 
+    def publish_episodic(self, memory: Mapping[str, Any]) -> None:
+        self._client.query(
+            """
+            UPSERT type::thing('tm_episodic_memory', $memory_id)
+            CONTENT $memory;
+            """,
+            {"memory_id": str(memory["id"]), "memory": dict(memory)},
+        )
+
+    def publish_episodic_embedding(
+        self,
+        memory_id: str,
+        embedding: list[float],
+    ) -> None:
+        self._client.query(
+            """
+            UPDATE type::thing('tm_episodic_memory', $memory_id)
+            SET embedding = $embedding;
+            """,
+            {"memory_id": memory_id, "embedding": list(embedding)},
+        )
+
 
 def get_secondary_store() -> SecondaryStore:
     """Build the configured store. Empty/disabled/none values select a no-op."""
@@ -197,6 +239,44 @@ class SecondaryWritingDatabase:
                 logger.exception(
                     "Secondary-store state publication failed for agent %s",
                     state.get("agent_id"),
+                )
+        return result
+
+    def insert_episodic(self, data: Mapping[str, Any]) -> bool:
+        primary_payload = deepcopy(dict(data))
+        secondary_payload = deepcopy(dict(data))
+        result = self.primary.insert_episodic(primary_payload)
+        if result:
+            try:
+                self.store.publish_episodic(secondary_payload)
+            except Exception:
+                logger.exception(
+                    "Secondary-store episodic publication failed for memory %s",
+                    data.get("id"),
+                )
+        return result
+
+    def update_episodic_embedding(
+        self,
+        memory_id: str,
+        embedding: list[float],
+    ) -> bool:
+        primary_embedding = deepcopy(embedding)
+        secondary_embedding = deepcopy(embedding)
+        result = self.primary.update_episodic_embedding(
+            memory_id,
+            primary_embedding,
+        )
+        if result:
+            try:
+                self.store.publish_episodic_embedding(
+                    memory_id,
+                    secondary_embedding,
+                )
+            except Exception:
+                logger.exception(
+                    "Secondary-store embedding publication failed for memory %s",
+                    memory_id,
                 )
         return result
 

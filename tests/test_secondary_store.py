@@ -89,6 +89,50 @@ def test_surreal_publisher_uses_v2_client_and_publishes_graph(monkeypatch):
     assert query_calls[1][2]["reference_id"] == "decision-0"
 
 
+def test_surreal_publisher_publishes_episodic_and_embedding(monkeypatch):
+    calls = []
+
+    class FakeSurreal:
+        def __init__(self, url):
+            del url
+
+        def use(self, namespace, database):
+            del namespace, database
+
+        def query(self, query, variables):
+            calls.append((query, variables))
+
+    monkeypatch.setitem(sys.modules, "surrealdb", SimpleNamespace(Surreal=FakeSurreal))
+    monkeypatch.delenv("SURREAL_USER", raising=False)
+    monkeypatch.delenv("SURREAL_PASS", raising=False)
+
+    store = SurrealGraphPublisher()
+    store.publish_episodic(
+        {
+            "id": "episode-1",
+            "strategy": "VolBreakout",
+            "context_json": {"regime": "trend"},
+        }
+    )
+    store.publish_episodic_embedding("episode-1", [0.25, 0.75])
+
+    assert len(calls) == 2
+    assert "UPSERT type::thing('tm_episodic_memory', $memory_id)" in calls[0][0]
+    assert calls[0][1] == {
+        "memory_id": "episode-1",
+        "memory": {
+            "id": "episode-1",
+            "strategy": "VolBreakout",
+            "context_json": {"regime": "trend"},
+        },
+    }
+    assert "UPDATE type::thing('tm_episodic_memory', $memory_id)" in calls[1][0]
+    assert calls[1][1] == {
+        "memory_id": "episode-1",
+        "embedding": [0.25, 0.75],
+    }
+
+
 def test_surreal_credentials_must_be_paired(monkeypatch):
     monkeypatch.setitem(
         sys.modules,
@@ -138,6 +182,111 @@ def test_secondary_failure_does_not_change_primary_result():
     wrapped = SecondaryWritingDatabase(Primary(), Store())
 
     assert wrapped.insert_decision({"id": "decision-1"}) is True
+
+
+def test_wrapper_publishes_episodic_after_primary_without_mutation_leak():
+    calls = []
+
+    class Primary:
+        def insert_episodic(self, data):
+            calls.append(("primary", data["id"]))
+            data["context_json"] = '{"regime":"trend"}'
+            return True
+
+    class Store(DisabledSecondaryStore):
+        def publish_episodic(self, memory):
+            calls.append(("secondary", memory["id"], memory["context_json"]))
+
+    original = {"id": "episode-1", "context_json": {"regime": "trend"}}
+    wrapped = SecondaryWritingDatabase(Primary(), Store())
+
+    assert wrapped.insert_episodic(original) is True
+    assert calls == [
+        ("primary", "episode-1"),
+        ("secondary", "episode-1", {"regime": "trend"}),
+    ]
+    assert original["context_json"] == {"regime": "trend"}
+
+
+def test_wrapper_publishes_embedding_after_primary():
+    calls = []
+
+    class Primary:
+        def update_episodic_embedding(self, memory_id, embedding):
+            calls.append(("primary", memory_id, list(embedding)))
+            embedding.append(1.0)
+            return True
+
+    class Store(DisabledSecondaryStore):
+        def publish_episodic_embedding(self, memory_id, embedding):
+            calls.append(("secondary", memory_id, list(embedding)))
+
+    embedding = [0.25, 0.75]
+    wrapped = SecondaryWritingDatabase(Primary(), Store())
+
+    assert wrapped.update_episodic_embedding("episode-1", embedding) is True
+    assert calls == [
+        ("primary", "episode-1", [0.25, 0.75]),
+        ("secondary", "episode-1", [0.25, 0.75]),
+    ]
+    assert embedding == [0.25, 0.75]
+
+
+@pytest.mark.parametrize("method", ["insert", "embedding"])
+def test_episodic_secondary_failure_does_not_change_primary_result(method):
+    class Primary:
+        def insert_episodic(self, data):
+            del data
+            return True
+
+        def update_episodic_embedding(self, memory_id, embedding):
+            del memory_id, embedding
+            return True
+
+    class Store(DisabledSecondaryStore):
+        def publish_episodic(self, memory):
+            del memory
+            raise OSError("offline")
+
+        def publish_episodic_embedding(self, memory_id, embedding):
+            del memory_id, embedding
+            raise OSError("offline")
+
+    wrapped = SecondaryWritingDatabase(Primary(), Store())
+
+    if method == "insert":
+        assert wrapped.insert_episodic({"id": "episode-1"}) is True
+    else:
+        assert wrapped.update_episodic_embedding("episode-1", [0.5]) is True
+
+
+@pytest.mark.parametrize("method", ["insert", "embedding"])
+def test_episodic_secondary_is_skipped_when_primary_returns_false(method):
+    calls = []
+
+    class Primary:
+        def insert_episodic(self, data):
+            del data
+            return False
+
+        def update_episodic_embedding(self, memory_id, embedding):
+            del memory_id, embedding
+            return False
+
+    class Store(DisabledSecondaryStore):
+        def publish_episodic(self, memory):
+            calls.append(memory)
+
+        def publish_episodic_embedding(self, memory_id, embedding):
+            calls.append((memory_id, embedding))
+
+    wrapped = SecondaryWritingDatabase(Primary(), Store())
+
+    if method == "insert":
+        assert wrapped.insert_episodic({"id": "episode-1"}) is False
+    else:
+        assert wrapped.update_episodic_embedding("episode-1", [0.5]) is False
+    assert calls == []
 
 
 def test_disabled_store_returns_plain_primary(monkeypatch):
