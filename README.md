@@ -1,8 +1,8 @@
 # DecisionMemory + Database Manager
 
-Persistent, outcome-aware memory for AI decision agents, with SQLite as its authoritative store.
+Persistent, outcome-aware memory for AI decision agents.
 
-DecisionMemory records decisions and outcomes, recalls relevant prior decisions, tracks behavioral state, and exposes its workflows through MCP, REST, and CLI interfaces. The repository includes a lightweight SurrealDB CLI and an experimental LanceDB/FastEmbed component.
+DecisionMemory stores its operational data in SQLite. It records decisions and outcomes, recalls relevant prior decisions, tracks behavioral state, and exposes its workflows through MCP, REST, and CLI interfaces. SurrealDB can receive an optional graph copy for shared database-manager workflows.
 
 ## What It Includes
 
@@ -11,26 +11,31 @@ DecisionMemory records decisions and outcomes, recalls relevant prior decisions,
 - SHA-256 decision audit chains and daily Merkle roots
 - Decision-Making plans, behavioral analysis, legitimacy checks, and strategy validation
 - SQLite transactions and isolated local databases
-- Optional fail-open publication to a shared SurrealDB graph
+- Optional, fail-open publication to a shared SurrealDB graph
 - MCP server, REST API, and management CLI
 - Database-manager skill instructions and Rust source
 
 ## Quick Start
 
-Requirements: Python 3.10+, `curl`, and optionally Rust/Cargo.
+Requirements: Python 3.10+.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[test]'
+python -m decisionmemory
+```
+
+SQLite is initialized automatically. By default, data is stored under `~/.decisionmemory/decisionmemory.db` when that file exists, otherwise `data/decisionmemory.db`. Set `DECISIONMEMORY_DB` to choose another path.
+
+## Optional Database Manager Setup
+
+The complete setup script installs the optional SurrealDB client/server, Python LanceDB package, and Rust database-manager CLI when supported:
 
 ```bash
 ./scripts/setup-databases.sh
 source .venv/bin/activate
-python -m decisionmemory
 ```
-
-The setup script:
-
-1. Creates `.venv` and installs DecisionMemory with test and SurrealDB support.
-2. Installs Python LanceDB if it is missing.
-3. Installs the `surreal` server with Homebrew on macOS or SurrealDB's official installer on Linux when absent.
-4. Builds the lightweight database-manager CLI when Cargo is available.
 
 Start a local authenticated SurrealDB instance in another terminal:
 
@@ -38,7 +43,7 @@ Start a local authenticated SurrealDB instance in another terminal:
 ./scripts/start-surreal.sh
 ```
 
-Set `INSTALL_SURREAL=0` before setup to skip automatic SurrealDB installation.
+Set `INSTALL_SURREAL=0` before running the setup script to skip automatic SurrealDB installation.
 
 To publish a secondary graph copy while retaining SQLite:
 
@@ -52,7 +57,7 @@ export SURREAL_DB=unified
 python -m decisionmemory
 ```
 
-SurrealDB failures are logged and do not roll back successful SQLite writes. Reads, audit chains, reporting, and tests continue to use SQLite.
+The publisher mirrors decisions, outcomes, session state, and decision-reference relationships after successful SQLite writes. SurrealDB failures are logged and do not roll back SQLite. Reads, audit chains, reporting, and tests continue to use SQLite.
 
 The REST API also defaults to port `8000`, so run it on another port when SurrealDB is local:
 
@@ -70,19 +75,19 @@ database-manager/db-cli-optimized/target/release/db-cli-optimized \
   search --keyword breakout --table memory
 ```
 
-`database-manager/lancedb-hybrid` remains downstream experimental source. DecisionMemory does not synchronously write to it.
+`database-manager/lancedb-hybrid` remains downstream experimental source. DecisionMemory does not synchronously write to LanceDB.
 
 No user databases, model caches, compiled binaries, or private memory records are included.
 
 ## Tests
 
-Core tests:
+Run the core suite:
 
 ```bash
-python -m pytest tests -q
+python -m pytest -q -m "not integration"
 ```
 
-SurrealDB integration tests use the disposable `decisionmemory_test` database and skip when SurrealDB is unavailable:
+Run live SurrealDB tests only against the disposable `decisionmemory_test` database:
 
 ```bash
 python -m pytest tests/test_surreal_backend.py tests/test_surreal_chain.py -q -m integration
@@ -92,6 +97,7 @@ python -m pytest tests/test_surreal_backend.py tests/test_surreal_chain.py -q -m
 
 - SurrealDB publication is optional and currently has no durable retry queue.
 - LanceDB is packaged as an optional SDK and experimental Rust prototype, not a unified production index.
+- The legacy full SurrealDB database implementation remains for compatibility testing but is not selected by the application factory.
 - Strategy evolution and decision-quality research results are experimental and are not evidence of decision-making positive outcomes.
 - MT5 remains the primary documented provider connector.
 
