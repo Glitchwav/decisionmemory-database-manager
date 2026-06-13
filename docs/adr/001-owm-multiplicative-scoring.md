@@ -42,7 +42,7 @@ Each factor is normalized to `[0, 1]` with a configurable floor to prevent colla
 
 **Cognitive science grounding.** Tulving's encoding specificity principle (1973) demonstrates that memory retrieval depends on the *match* between encoding context and retrieval context across multiple independent dimensions. The multiplicative model mirrors this: a memory must match well on ALL dimensions to surface, not just dominate on one.
 
-**Production constraints.** Deterministic computation, no GPU, no model loading, no inference latency. The entire recall operation is a SurrealDB query followed by Python arithmetic.
+**Production constraints.** Deterministic computation, no GPU, no model loading, no inference latency. The entire recall operation is a SQLite query followed by Python arithmetic.
 
 ## Implementation Details
 

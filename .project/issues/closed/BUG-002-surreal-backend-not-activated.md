@@ -8,11 +8,11 @@
 
 ## Summary
 
-Setting `DECISIONMEMORY_BACKEND=surreal` does not switch the main application to SurrealDB. Core production paths instantiate the SurrealDB `Database` class directly and never call the new factory.
+Setting `DECISIONMEMORY_BACKEND=surreal` does not switch the main application to SurrealDB. Core production paths instantiate the SQLite `Database` class directly and never call the new factory.
 
 ## Evidence
 
-The MCP server imports `Database` and initializes `_db = Database()`. Journal, state, repository, replay, simulation, and other paths follow the same pattern. A runtime probe with `DECISIONMEMORY_BACKEND=surreal` still produced SurrealDB-backed `DecisionJournal` and `StateManager` instances.
+The MCP server imports `Database` and initializes `_db = Database()`. Journal, state, repository, replay, simulation, and other paths follow the same pattern. A runtime probe with `DECISIONMEMORY_BACKEND=surreal` still produced SQLite-backed `DecisionJournal` and `StateManager` instances.
 
 ## Root cause
 

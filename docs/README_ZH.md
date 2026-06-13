@@ -129,7 +129,7 @@ docker compose up -d
 |---|---|---|---|
 | **價格** | **免費** | **$29/月**（即將推出） | **洽詢我們** |
 | MCP 工具 | 17 個工具 | 17 個工具 | 17 個工具 |
-| 儲存 | SurrealDB，自架 | Hosted API | 私有部署 |
+| 儲存 | SQLite，自架 | Hosted API | 私有部署 |
 | Dashboard | — | Web dashboard | 客製化 dashboard |
 | 合規 | 審計軌跡含括 | 審計軌跡含括 | 合規報告 + SLA |
 | 支援 | GitHub Issues | 優先支援 | 專屬支援 |

@@ -36,25 +36,28 @@ def _check_python_version() -> CheckResult:
     )
 
 
-def _check_surrealdb_database() -> CheckResult:
-    """Check that the configured SurrealDB instance is reachable."""
+def _check_sqlite_database() -> CheckResult:
+    """Check SQLite database can be created/opened."""
     start = time.monotonic()
     try:
-        from decisionmemory.db import Database
-
-        db = Database()
-        db.query_decisions(limit=1)
+        data_dir = Path.home() / ".decisionmemory"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        import sqlite3
+        db_path = data_dir / "decisionmemory.db"
+        conn = sqlite3.connect(str(db_path))
+        conn.execute("SELECT 1")
+        conn.close()
         elapsed = (time.monotonic() - start) * 1000
         return CheckResult(
-            name="SurrealDB database",
+            name="SQLite database",
             status="pass",
-            detail="Connection and query succeeded",
+            detail=str(db_path),
             elapsed_ms=elapsed,
         )
     except Exception as e:
         elapsed = (time.monotonic() - start) * 1000
         return CheckResult(
-            name="SurrealDB database",
+            name="SQLite database",
             status="fail",
             detail=str(e),
             elapsed_ms=elapsed,
@@ -275,7 +278,7 @@ def run_doctor(full: bool = False) -> List[CheckResult]:
 
     # Core checks (always run)
     results.append(_check_python_version())
-    results.append(_check_surrealdb_database())
+    results.append(_check_sqlite_database())
     results.append(_check_mcp_tools())
     results.append(_check_write_read_delete())
 

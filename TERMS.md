@@ -28,7 +28,7 @@ performance. Decision Contexts involve risk of loss.
 
 ## 4. Data Storage
 
-By default, all data is stored locally in SurrealDB on your machine. No data is
+By default, all data is stored locally in SQLite on your machine. No data is
 sent to external servers unless you explicitly configure PostgreSQL, Supabase,
 or other remote storage. If you configure the REST API or MT5 sync, data may
 be transmitted over your local network.

@@ -6,7 +6,7 @@ startCommand:
     properties:
       dbUrl:
         type: string
-        description: "Database URL (default: SurrealDB in ~/.decisionmemory/decisionmemory.db). Use postgresql://... for PostgreSQL."
+        description: "Database URL (default: SQLite in ~/.decisionmemory/decisionmemory.db). Use postgresql://... for PostgreSQL."
   commandFunction: |-
     (config) => ({
       command: 'decisionmemory-protocol',

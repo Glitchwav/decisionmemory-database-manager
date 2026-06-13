@@ -76,7 +76,7 @@ curl -X POST https://registry.smithery.ai/servers \
 `smithery.yaml` 定義了：
 - **Transport**: stdio（標準 MCP transport）
 - **Command**: `decisionmemory-protocol`（pip install 後的 CLI 指令）
-- **可選配置**: `dbUrl` — 使用者可以設定 PostgreSQL 連線，預設用 SurrealDB
+- **可選配置**: `dbUrl` — 使用者可以設定 PostgreSQL 連線，預設用 SQLite
 
 ## 注意事項
 

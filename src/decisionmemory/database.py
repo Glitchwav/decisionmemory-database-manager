@@ -2,7 +2,7 @@
 PostgreSQL async database engine for DecisionMemory Dashboard.
 
 Uses SQLAlchemy 2.0 async with asyncpg.
-This module provides the optional PostgreSQL dashboard engine.
+Existing SQLite (db.py) remains untouched for MCP tools.
 """
 
 import os

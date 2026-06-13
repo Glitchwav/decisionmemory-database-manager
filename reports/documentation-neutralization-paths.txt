@@ -57,7 +57,7 @@ docs/TUTORIAL_ZH.md
 docs/USE_CASES.md
 docs/VALIDATION_RESULTS.md
 docs/adr/001-owm-multiplicative-scoring.md
-docs/adr/002-surrealdb-over-postgres.md
+docs/adr/002-sqlite-over-postgres.md
 docs/adr/003-mcp-protocol-choice.md
 docs/adr/004-evolution-statistical-gates.md
 docs/anti-resonance-package.md

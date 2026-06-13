@@ -109,7 +109,7 @@ Cards linking to `docs/USE_CASES.md`:
 
 | Tier | Price | Features | Audience |
 |------|-------|----------|----------|
-| Community | Free | 19 MCP tools, SurrealDB, self-hosted, full OWM + reflection engine | Individual decision-makers, AI agent developers, researchers |
+| Community | Free | 19 MCP tools, SQLite, self-hosted, full OWM + reflection engine | Individual decision-makers, AI agent developers, researchers |
 | Pro | $29/mo (Coming Soon) | Hosted API, web dashboard, priority support | Active decision-makers, small teams |
 | Enterprise | Contact Us | Private deployment, compliance reports, custom integration, SLA | Prop firms, funds, compliance teams |
 

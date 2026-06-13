@@ -160,7 +160,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ### Added
 - **L3 Strategy Adjustments** — Rule-based strategy tuning from L2 patterns
-  - `strategy_adjustments` table in SurrealDB with proposed/approved/applied/rejected lifecycle
+  - `strategy_adjustments` table in SQLite with proposed/approved/applied/rejected lifecycle
   - 5 deterministic rules: strategy_disable, strategy_prefer, session_reduce, session_increase, direction_restrict
   - `generate_l3_adjustments()` in ReflectionEngine — reads L2 patterns, outputs proposed adjustments
   - 3 CRUD methods in Database: `insert_adjustment`, `query_adjustments`, `update_adjustment_status`
@@ -197,7 +197,7 @@ Initial open-source release. Built over 2 days of intensive development.
 ### Added
 - Core MCP server (FastAPI) with decision journal, reflection engine, state management
 - DecisionRecord and SessionState data models (Pydantic v2)
-- SurrealDB database with schema initialization
+- SQLite database with schema initialization
 - DecisionJournal — record decisions, outcomes, query history
 - ReflectionEngine — daily summary generation (rule-based + optional LLM)
 - LLM output validation with rule-based fallback
@@ -223,4 +223,4 @@ Initial open-source release. Built over 2 days of intensive development.
 - Platform-agnostic core — MT5-specific code isolated in adapters
 - LLM outputs validated before entering L2 memory (garbage prevention)
 - Rule-based reflection fallback when no API key is configured
-- 3-layer memory: L1 (hot/RAM), L2 (warm/JSON), L3 (cold/SurrealDB)
+- 3-layer memory: L1 (hot/RAM), L2 (warm/JSON), L3 (cold/SQLite)

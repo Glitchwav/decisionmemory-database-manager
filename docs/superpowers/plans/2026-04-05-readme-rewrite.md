@@ -570,7 +570,7 @@ docker compose up -d
 |---|---|---|---|
 | **Price** | **Free** | **$29/mo** (Coming Soon) | **Contact Us** |
 | MCP tools | 19 tools | 19 tools | 19 tools |
-| Storage | SurrealDB, self-hosted | Hosted API | Private deployment |
+| Storage | SQLite, self-hosted | Hosted API | Private deployment |
 | Dashboard | — | Web dashboard | Custom dashboard |
 | Compliance | Audit trail included | Audit trail included | Compliance reports + SLA |
 | Support | GitHub Issues | Priority support | Dedicated support |

@@ -16,7 +16,7 @@ SurrealDB decision insertion commits before the audit-chain entry is created. If
 
 ## Root cause
 
-SurrealDB transaction assumptions were carried into an HTTP-backed compatibility wrapper without implementing a SurrealDB transaction or compensating recovery logic.
+SQLite transaction assumptions were carried into an HTTP-backed compatibility wrapper without implementing a SurrealDB transaction or compensating recovery logic.
 
 ## Suggested fix
 

@@ -1,8 +1,8 @@
-"""Database factory for the SurrealDB-backed DecisionMemory runtime."""
-
-from .db_surreal import SurrealDatabase
+"""Canonical DecisionMemory database factory."""
 
 
-def get_database(db_path: str | None = None) -> SurrealDatabase:
-    """Return the configured SurrealDB database."""
-    return SurrealDatabase()
+def get_database(db_path: str | None = None):
+    """Delegate to the SQLite-first factory."""
+    from .db import get_database as _get_database
+
+    return _get_database(db_path)

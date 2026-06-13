@@ -43,7 +43,7 @@ Detection: check for `.decisionmemory_setup_done` marker file in data dir.
 - NOT decision advice
 - Past data ≠ future results
 - User responsible for all decisions
-- Data stored locally (SurrealDB) by default
+- Data stored locally (SQLite) by default
 - No external transmission unless configured
 - Full terms: TERMS.md
 

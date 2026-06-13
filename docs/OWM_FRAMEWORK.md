@@ -114,7 +114,7 @@ Where:
 - `conf` : confidence at time of decision, in [0, 1]
 - `tags` : set of categorical labels
 
-#### Data Schema (SurrealDB)
+#### Data Schema (SQLite)
 
 ```sql
 CREATE TABLE episodic_memory (
@@ -1258,7 +1258,7 @@ For a query with N total memories:
 
 With N = 10,000 memories (Sean's current dataset), this takes < 50ms on any modern machine. For N = 100,000+, pre-filtering by symbol and strategy reduces the candidate set to O(1000), keeping the system responsive.
 
-SurrealDB indexes on `symbol`, `strategy`, `regime`, `timestamp` ensure that pre-filtering is O(log N).
+SQLite indexes on `symbol`, `strategy`, `regime`, `timestamp` ensure that pre-filtering is O(log N).
 
 ---
 

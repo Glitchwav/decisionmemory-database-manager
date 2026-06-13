@@ -13,7 +13,7 @@ Output: JSON report + human-readable summary
 import os
 import sys
 import json
-import surrealdb
+import sqlite3
 import argparse
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -69,8 +69,8 @@ def get_db_decisions(days_back=30):
     if not DB_PATH.exists():
         return []
 
-    conn = surrealdb.connect(str(DB_PATH))
-    conn.row_factory = surrealdb.Row
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
     cutoff = (datetime.now() - timedelta(days=days_back)).isoformat()
     rows = conn.execute(
         "SELECT * FROM decision_records WHERE timestamp >= ? ORDER BY timestamp DESC",

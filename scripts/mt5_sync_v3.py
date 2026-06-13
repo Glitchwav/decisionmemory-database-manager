@@ -4,7 +4,7 @@ MT5 Sync v3 — FastAPI + background MT5 poller
 Architecture:
   - FastAPI on port 9001 (GET /health, /open-positions, /recent-decisions)
   - MT5Poller runs in daemon thread, polls every SYNC_INTERVAL (default 60s)
-  - SurrealDB for state: open_positions, sync_state, sync_log
+  - SQLite for state: open_positions, sync_state, sync_log
   - Closed decisions → DecisionMemory API (record_decision + record_outcome)
 
 啟動: python scripts/mt5_sync_v3.py
@@ -18,7 +18,7 @@ import re
 import sys
 import time
 import logging
-import surrealdb
+import sqlite3
 import threading
 import requests
 from datetime import datetime, timezone
@@ -598,7 +598,7 @@ def _get_contract_size(symbol: str) -> float:
 
 
 # ---------------------------------------------------------------------------
-# SurrealDB helpers
+# SQLite helpers
 # ---------------------------------------------------------------------------
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mt5_sync_v3.db")
@@ -639,8 +639,8 @@ def init_db():
 
 @contextmanager
 def get_db():
-    conn = surrealdb.connect(DB_PATH)
-    conn.row_factory = surrealdb.Row
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     try:
         yield conn
         conn.commit()
@@ -652,7 +652,7 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _log_event(conn: surrealdb.Connection, event_type: str, message: str):
+def _log_event(conn: sqlite3.Connection, event_type: str, message: str):
     conn.execute(
         "INSERT INTO sync_log (timestamp, event_type, message) VALUES (?, ?, ?)",
         (_now_iso(), event_type, message),
@@ -685,7 +685,7 @@ def send_discord(message: str, color: int = 0x00FF00):
 # ---------------------------------------------------------------------------
 
 class MT5Poller:
-    """Polls MT5 terminal in a daemon thread. Writes results to SurrealDB."""
+    """Polls MT5 terminal in a daemon thread. Writes results to SQLite."""
 
     def __init__(self):
         self._mt5_alive = False
@@ -795,7 +795,7 @@ class MT5Poller:
             pass
         return self.init_mt5()
 
-    # --- Open positions → SurrealDB ---
+    # --- Open positions → SQLite ---
 
     def _sync_open_positions(self):
         """

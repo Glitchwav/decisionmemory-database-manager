@@ -37,7 +37,7 @@ Internet
   │                      │
   │                      └──► decisionmemory-api:8080 (FastAPI/uvicorn)
   │                             │
-  │                             └──► /app/data/hosted.db (SurrealDB, persistent volume)
+  │                             └──► /app/data/hosted.db (SQLite, persistent volume)
   │
   └── :80 (HTTP) ───► Caddy (redirect to HTTPS)
 ```
@@ -54,7 +54,7 @@ Internet
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `TM_API_KEYS` | Yes | Comma-separated API keys. Format: `key:account_id:plan` |
-| `TM_HOSTED_DB` | No | SurrealDB path (default: `/app/data/hosted.db`) |
+| `TM_HOSTED_DB` | No | SQLite path (default: `/app/data/hosted.db`) |
 
 ## API Endpoints
 
@@ -95,7 +95,7 @@ curl -s https://mcp.mnemox.ai/api/v1/health | python -m json.tool
 
 ## Data Persistence
 
-SurrealDB database is stored in a Docker named volume (`decisionmemory-data`). Data survives container restarts and rebuilds. For production, consider migrating to PostgreSQL.
+SQLite database is stored in a Docker named volume (`decisionmemory-data`). Data survives container restarts and rebuilds. For production, consider migrating to PostgreSQL.
 
 ## TLS Certificates
 

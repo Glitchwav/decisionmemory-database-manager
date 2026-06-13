@@ -244,7 +244,7 @@ Sources:
 
 | Tier | Price | Target | Features |
 |------|-------|--------|----------|
-| **Community** | Free (MIT) | Individual devs, students | 15 MCP tools, SurrealDB, local only, full OWM |
+| **Community** | Free (MIT) | Individual devs, students | 15 MCP tools, SQLite, local only, full OWM |
 | **Pro** | $29-49/mo | Indie decision-makers, small teams | Cloud hosted, multi-agent sync, advanced reflection, priority support |
 | **Team** | $99-199/mo | Decision-Making desks, prop firms | Team dashboards, shared memory, API access, SLA |
 | **Enterprise** | Custom ($500+/mo) | Institutions, hedge funds | On-prem deployment, custom integrations, dedicated support |
