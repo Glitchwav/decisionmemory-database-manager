@@ -2,7 +2,7 @@
 
 Persistent, outcome-aware memory for AI decision agents.
 
-DecisionMemory stores its operational data in SQLite. It records decisions and outcomes, recalls relevant prior decisions, tracks behavioral state, and exposes its workflows through MCP, REST, and CLI interfaces. SurrealDB can receive an optional graph copy for shared database-manager workflows.
+DecisionMemory stores authoritative application data in SQLite. It records decisions and outcomes, recalls relevant prior decisions, tracks behavioral state, and exposes its workflows through MCP, REST, and CLI interfaces. An optional database-manager integration publishes a fail-open secondary copy to persistent SurrealDB and supports offline semantic indexing with LanceDB.
 
 ## What It Includes
 
@@ -11,7 +11,8 @@ DecisionMemory stores its operational data in SQLite. It records decisions and o
 - SHA-256 decision audit chains and daily Merkle roots
 - Decision-Making plans, behavioral analysis, legitimacy checks, and strategy validation
 - SQLite transactions and isolated local databases
-- Optional, fail-open publication to a shared SurrealDB graph
+- Optional, fail-open publication of decisions, episodic memories, embeddings, outcomes, session state, and reference relationships to SurrealDB
+- Non-destructive LanceDB candidate-index workflow for semantic validation
 - MCP server, REST API, and management CLI
 - Database-manager skill instructions and Rust source
 
@@ -28,36 +29,55 @@ python -m decisionmemory
 
 SQLite is initialized automatically. By default, data is stored under `~/.decisionmemory/decisionmemory.db` when that file exists, otherwise `data/decisionmemory.db`. Set `DECISIONMEMORY_DB` to choose another path.
 
-## Optional Database Manager Setup
+## Database Manager Setup
 
-The complete setup script installs the optional SurrealDB client/server, Python LanceDB package, and Rust database-manager CLI when supported:
+Install the optional Python database client and local tooling:
 
 ```bash
 ./scripts/setup-databases.sh
 source .venv/bin/activate
 ```
 
-Start a local authenticated SurrealDB instance in another terminal:
+When the database-manager service is installed on the backup drive, start and verify persistent SurrealDB with:
 
 ```bash
-./scripts/start-surreal.sh
+SM="/Volumes/Backup Drive/scratch/service-manager/sm"
+"$SM" start surrealdb
+"$SM" status surrealdb
 ```
 
-Set `INSTALL_SURREAL=0` before running the setup script to skip automatic SurrealDB installation.
+Expected status:
+
+```text
+surreal: Running (persistent backup-drive storage)
+```
+
+The verified service binds to `127.0.0.1:8000`, runs without authentication, and stores data under:
+
+```text
+/Volumes/Backup Drive/scratch/database-manager/SurrealDB
+```
+
+Use `"$SM" restart surrealdb` for a controlled restart. The status check verifies the bind address, authentication mode, and persistent data path rather than only checking whether port 8000 is open.
+
+Do not run `scripts/start-surreal.sh` at the same time as the shared database-manager service. That script uses separate configuration and will contend for port 8000.
 
 To publish a secondary graph copy while retaining SQLite:
 
 ```bash
 cp .env.example .env
 export DECISIONMEMORY_SECONDARY_STORE=surreal
-export SURREAL_USER=root
-export SURREAL_PASS=secret
+export SURREAL_HOST=http://127.0.0.1
+export SURREAL_PORT=8000
 export SURREAL_NS=antigravity
 export SURREAL_DB=unified
+unset SURREAL_USER SURREAL_PASS
 python -m decisionmemory
 ```
 
-The publisher mirrors decisions, outcomes, session state, and decision-reference relationships after successful SQLite writes. SurrealDB failures are logged and do not roll back SQLite. Reads, audit chains, reporting, and tests continue to use SQLite.
+Set both `SURREAL_USER` and `SURREAL_PASS` only when connecting to an authenticated SurrealDB instance. Supplying only one credential is rejected.
+
+The publisher runs after successful SQLite commits. SurrealDB failures are logged and do not roll back SQLite. Reads, audit chains, reporting, and application tests continue to use SQLite.
 
 The REST API also defaults to port `8000`, so run it on another port when SurrealDB is local:
 
@@ -75,7 +95,19 @@ database-manager/db-cli-optimized/target/release/db-cli-optimized \
   search --keyword breakout --table memory
 ```
 
-`database-manager/lancedb-hybrid` remains downstream experimental source. DecisionMemory does not synchronously write to LanceDB.
+DecisionMemory does not write directly to the live LanceDB table. Semantic indexes are built offline from SurrealDB records so they can be validated before use.
+
+The non-destructive indexing process is:
+
+1. Export records to a new JSONL file.
+2. Build a new LanceDB directory and table.
+3. Validate record counts, unique IDs, and representative semantic searches.
+4. Switch the configured path only after validation succeeds.
+5. Retain the previous directory for rollback.
+
+Repeated ingestion into the same table is not supported because the current FFI appends records. Always build a fresh candidate index instead.
+
+This workflow has been verified with the real CoreML embedding model, Rust FFI, and LanceDB without changing the live index.
 
 No user databases, model caches, compiled binaries, or private memory records are included.
 
@@ -90,16 +122,20 @@ python -m pytest -q -m "not integration"
 Run live SurrealDB tests only against the disposable `decisionmemory_test` database:
 
 ```bash
-python -m pytest tests/test_surreal_backend.py tests/test_surreal_chain.py -q -m integration
+SURREAL_USER='' SURREAL_PASS='' SURREAL_DB_TEST=decisionmemory_test \
+  python -m pytest tests/test_surreal_backend.py tests/test_surreal_chain.py \
+  -q -m integration
 ```
+
+The verified live integration suite contains 43 tests.
 
 ## Current Limits
 
 - SurrealDB publication is optional and currently has no durable retry queue.
-- LanceDB is packaged as an optional SDK and experimental Rust prototype, not a unified production index.
+- Existing SQLite records need an explicit backfill before they appear in SurrealDB or a candidate semantic index.
+- LanceDB indexing is asynchronous and requires a fresh-directory rebuild to avoid duplicate IDs.
+- Semantic quality depends on descriptive context and reflection appearing early in exported text because the CoreML model uses the first 128 WordPiece tokens.
 - The legacy full SurrealDB database implementation remains for compatibility testing but is not selected by the application factory.
-- Strategy evolution and decision-quality research results are experimental and are not evidence of decision-making positive outcomes.
-- MT5 remains the primary documented provider connector.
 
 See [LIMITATIONS.md](LIMITATIONS.md) and [.project/issues/open](.project/issues/open) for tracked constraints.
 
